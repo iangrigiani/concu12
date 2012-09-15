@@ -1,10 +1,3 @@
-/*
- * Salida.cpp
- *
- *  Created on: 11/09/2012
- *      Author: catu
- */
-
 #include "Salida.h"
 
 Salida::Salida() {

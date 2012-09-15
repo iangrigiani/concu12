@@ -1,10 +1,5 @@
-/*
- * simulador.cpp
- *
- *  Created on: 08/09/2012
- *      Author: nacho
- */
-#include "simulador.h"
+
+#include "Simulador.h"
 
 
 Simulador::Simulador(){

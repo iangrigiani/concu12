@@ -1,10 +1,3 @@
-/*
- * Entrada.cpp
- *
- *  Created on: 11/09/2012
- *      Author: catu
- */
-
 #include "Entrada.h"
 
 Entrada::Entrada() {

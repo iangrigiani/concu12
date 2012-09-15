@@ -1,12 +1,8 @@
-/*
- * Cronometro.h
- *
- *  Created on: 11/09/2012
- *      Author: catu
- */
 
 #ifndef CRONOMETRO_H_
 #define CRONOMETRO_H_
+
+#include <stdio.h>
 
 class Cronometro {
 
@@ -14,23 +10,22 @@ private:
 
 	int tiempoASimular;
 	//static Date horaInicial;
-	static Cronometro cronometro;
-
+	static Cronometro * cronometro;
 	Cronometro();
 
 public:
 
 	virtual ~Cronometro();
 
-	static Cronometro obtenerCronometro();
+	static Cronometro * obtenerCronometro();
 
 	void iniciarTiempo();
 
-	static double getFlujoDeAutos();
+	double getFlujoDeAutos();
 
-	static bool llegoAlFinal();
+	bool llegoAlFinal();
 
-	static void pausaAleatoria(long milisegundos);
+	void pausaAleatoria(long milisegundos);
 
 	int getTiempoASimular();
 

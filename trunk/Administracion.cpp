@@ -1,4 +1,4 @@
-#include "administracion.h"
+#include "Administracion.h"
 
 
 Administracion::Administracion(){
