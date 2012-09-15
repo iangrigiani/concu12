@@ -1,9 +1,3 @@
-/*
- * Barrera.h
- *
- *  Created on: 11/09/2012
- *      Author: catu
- */
 
 #ifndef BARRERA_H_
 #define BARRERA_H_
