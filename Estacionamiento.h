@@ -4,15 +4,17 @@
 
 
 #include <stdio.h>
+#include <list>
 #include "Administracion.h"
+#include "Entrada.h"
+#include "Salida.h"
 
 class Estacionamiento {
 
 private:
 
-	//TODO: ver declaracion de listas
-	//List <Barrera> entradas;
-	//List <Barrera> salidas;
+	list<Entrada*> * entradas;
+	list<Salida*> * salidas;
 	Administracion * administracionDelEstacionamiento;
 	static Estacionamiento * estacionamiento;
 	Estacionamiento();
@@ -23,7 +25,9 @@ public:
 
 	static Estacionamiento* obtenerEstacionamiento();
 
-	Administracion * obtenerAdministracion();
+	void setCantidadDeLugaresDisponibles(int cantidadLugares);
+
+	Administracion * getAdministracion();
 
 };
 

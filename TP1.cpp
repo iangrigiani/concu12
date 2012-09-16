@@ -1,9 +1,13 @@
+#include "Simulador.h"
 
-#include <iostream>
-
-using namespace std;
 
 int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+
+	Simulador * simulador = new Simulador();
+
+	simulador->simular();
+
+	delete simulador;
+
 	return 0;
 }
