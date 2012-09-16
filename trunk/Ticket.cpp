@@ -1,12 +1,38 @@
 #include "Ticket.h"
 
 
-Ticket::Ticket(){
+Ticket::Ticket()
+{
+	this->fechaEntrada = new Fecha();
+	this->pago = false;
 
 }
 
 
-Ticket::~Ticket(){
+Ticket::~Ticket()
+{
+	delete this->fechaEntrada;
 
 }
+
+
+void Ticket::setPago(bool pago)
+{
+	this->pago=pago;
+
+}
+
+
+bool Ticket::getPago()
+{
+	return this->pago;
+}
+
+
+Fecha * Ticket::getFechaEntrada()
+{
+	return this->fechaEntrada;
+}
+
+
 

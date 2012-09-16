@@ -1,42 +1,27 @@
 #include "Entrada.h"
 
-Entrada::Entrada() {
-	// TODO Auto-generated constructor stub
 
-}
+/*Este método registra la entra de un auto en el estacionamiento asignandole al mismo un Ticket,
+esto debe generar un proceso por cada auto que entra*/
+/*Devuelve true si el auto pudo acceder al estacionamiento*/
 
-Entrada::~Entrada() {
-	// TODO Auto-generated destructor stub
-}
+bool Entrada::registrarEntradaAuto(Auto * automovil)
+{
+	bool pudoAcceder = false;
+	//ACA se deberia verificar si el estacionamiento esta o no lleno.
+	//Si el estacionamiento no esta lleno se le permite el ingreso del auto.
+	int cantidadLugares = Historial::obtenerHistorial()->getCantidadDeLugaresDisponibles();
 
-/**
-	 * Implementacion del metodo definido en la clase Lector
-	 * Registra la entrada de una persona al edificio
-	 * Devuelve true si la persona pudo acceder al edificio.
-	 * @param persona
-	 * @return boolean
-	 */
-
-//TODO: implementacion de metodo abstracto en barrera
-/*	public synchronized   boolean registrarEntradaDeUnaPersona(Persona persona){
-
-		Date entrada = new Date();
-		Registro registro = new Registro(entrada);
-
-		if(!(persona.haEntradoAlEdificio())){
-			registro.setHaAccedido(true);
-			if(!this.getHistorial().getHistorialDePersonas().containsKey(persona)){
-				this.getHistorial().agregarNuevaPersonaAlHistorial(persona,registro);
-				}
-			else{
-				this.getHistorial().agregarNuevoRegistroAlHistorial(persona, registro);
-				}
-		}
-		else{
-			RegistroIndebido acceso= new RegistroIndebido(persona,entrada);
-			this.getHistorial().agregarNuevoAccesoIndebido(acceso);
-			}
-
-		return (registro.haAccedido());
+	if(cantidadLugares > 0)
+	{
+		Ticket * ticket = new Ticket();
+		automovil->setTicket(ticket);
+		Historial::obtenerHistorial()->agregarNuevoAutoAlHistorial(automovil);
+		cantidadLugares--;
+		Historial::obtenerHistorial()->setCantidadLugaresDispobibles(cantidadLugares);
+		pudoAcceder = true;
 	}
-*/
+
+	return pudoAcceder;
+}
+

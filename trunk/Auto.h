@@ -1,14 +1,20 @@
 #ifndef AUTO_H_
 #define AUTO_H_
 
+#include "Ticket.h"
+
 class Auto
 {
-private:
+	private:
+
+			Ticket * ticket;
 
 
-public:
-	Auto();
-	~Auto();
+	public:
+			Auto();
+			~Auto();
+			void setTicket(Ticket * ticket);
+			Ticket * getTicket();
 
 
 };
