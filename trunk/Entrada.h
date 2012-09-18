@@ -4,12 +4,23 @@
 
 #include "Historial.h"
 
-
 class Entrada {
 
+private:
+		int numeroDeEntrada;
+
 public:
-	Entrada(){}
+
+	Entrada(int numeroDeEntrada)
+	{
+		this->numeroDeEntrada = numeroDeEntrada;
+
+	}
+
+	int getNumeroDeEntrada();
+
 	bool registrarEntradaAuto(Auto * automovil);
+
 	virtual ~Entrada() { }
 };
 

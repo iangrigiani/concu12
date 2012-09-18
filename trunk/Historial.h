@@ -17,11 +17,19 @@ class Historial {
 	public:
 
 		static Historial* obtenerHistorial();
+
 		virtual ~Historial();
+
 		void agregarNuevoAutoAlHistorial(Auto * automovil);
+
 		void quitarAutoDelHistorial(Auto * automovil);
+
 		list<Auto*> * getHistorialDeAutos();
+
+		int getCantidadDeAutosEnEstacionamiento();
+
 		int getCantidadDeLugaresDisponibles();
+
 		void setCantidadLugaresDispobibles(int lugaresDisponibles);
 
 

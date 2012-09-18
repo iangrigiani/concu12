@@ -3,13 +3,14 @@
 #define CRONOMETRO_H_
 
 #include <stdio.h>
+#include "Fecha.h"
 
 class Cronometro {
 
 private:
 
 	int tiempoASimular;
-	//static Date horaInicial;
+	Fecha * horaInicial;
 	static Cronometro * cronometro;
 	Cronometro();
 

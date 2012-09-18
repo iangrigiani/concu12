@@ -2,7 +2,9 @@
 #include "Simulador.h"
 
 
-Simulador::Simulador(){
+Simulador::Simulador()
+{
+	this->estacionamiento = Estacionamiento::obtenerEstacionamiento();
 
 }
 
@@ -26,3 +28,5 @@ void Simulador::simular(){
 	}
 	*/
 }
+
+
