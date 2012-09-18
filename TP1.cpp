@@ -9,5 +9,6 @@ int main() {
 
 	delete simulador;
 
+
 	return 0;
 }

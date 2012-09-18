@@ -4,10 +4,13 @@
 
 
 #include <stdio.h>
-#include <list>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "Administracion.h"
 #include "Entrada.h"
 #include "Salida.h"
+using namespace std;
 
 class Estacionamiento {
 
@@ -28,6 +31,11 @@ public:
 	void setCantidadDeLugaresDisponibles(int cantidadLugares);
 
 	Administracion * getAdministracion();
+
+	Entrada * getEntradaAleatoria();
+
+	Salida * getSalidaAleatoria();
+
 
 };
 

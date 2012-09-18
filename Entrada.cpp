@@ -12,7 +12,8 @@ bool Entrada::registrarEntradaAuto(Auto * automovil)
 	//Si el estacionamiento no esta lleno se le permite el ingreso del auto.
 	int cantidadLugares = Historial::obtenerHistorial()->getCantidadDeLugaresDisponibles();
 
-	if(cantidadLugares > 0)
+
+	if(cantidadLugares > 0 && !automovil->getHaEntrado())
 	{
 		Ticket * ticket = new Ticket();
 		automovil->setTicket(ticket);
@@ -23,5 +24,11 @@ bool Entrada::registrarEntradaAuto(Auto * automovil)
 	}
 
 	return pudoAcceder;
+}
+
+
+int Entrada::getNumeroDeEntrada()
+{
+	return this->numeroDeEntrada;
 }
 

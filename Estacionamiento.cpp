@@ -7,10 +7,19 @@ Estacionamiento::Estacionamiento() {
 	this->entradas = new list<Entrada*>();
 	this->salidas  = new list<Salida*>();
 
-	//TODO agregar las entradas y salidas correspondientes
+	Entrada * entrada1 = new Entrada(1);
+	Entrada * entrada2 = new Entrada(2);
+	Entrada * entrada3 = new Entrada(3);
 
-	Entrada * entrada1 = new Entrada();
 	this->entradas->push_back(entrada1);
+	this->entradas->push_back(entrada2);
+	this->entradas->push_back(entrada3);
+
+	Salida * salida1 = new Salida(1);
+	Salida * salida2 = new Salida(2);
+
+	this->salidas->push_back(salida1);
+	this->salidas->push_back(salida2);
 
 	//Llamar a la administracion
 	this->administracionDelEstacionamiento = Administracion::obtenerAdministracion();
@@ -19,8 +28,8 @@ Estacionamiento::Estacionamiento() {
 
 Estacionamiento::~Estacionamiento()
 {
-	//TODO tener en cuenta de liberar las listas de entradas
-	//y salidas
+	//TODO IMPORTANTE!!! tener en cuenta de liberar las listas de entradas
+	//y salidas Y LA ADMINISTRACION
 
 }
 
@@ -31,7 +40,7 @@ Estacionamiento* Estacionamiento::obtenerEstacionamiento(){
 	return estacionamiento;
 }
 
-Administracion* Estacionamiento::getAdministracion(){
+Administracion * Estacionamiento::getAdministracion(){
 	return this->administracionDelEstacionamiento;
 }
 
@@ -39,4 +48,62 @@ Administracion* Estacionamiento::getAdministracion(){
 void Estacionamiento::setCantidadDeLugaresDisponibles(int cantidadLugares)
 {
 	this->administracionDelEstacionamiento->getHistorial()->setCantidadLugaresDispobibles(cantidadLugares);
+}
+
+
+Entrada * Estacionamiento::getEntradaAleatoria()
+{
+	int cantidadEntradas = this->entradas->size();
+	int numeroElegido;
+	int indiceActual = 0;
+	Entrada * entradaElegida;
+
+	srand((unsigned)time(0));
+	numeroElegido = (rand()%cantidadEntradas);
+
+	list<Entrada*>::iterator it = this->entradas->begin();
+
+	 while ( it != this->entradas->end())
+	 {
+		 if(indiceActual == numeroElegido)
+		 {
+			 entradaElegida = *it;
+			 break;
+		 }
+
+		 ++it;
+		 indiceActual++;
+	 }
+
+	 return entradaElegida;
+}
+
+
+
+Salida * Estacionamiento::getSalidaAleatoria()
+{
+	int cantidadSalidas = this->salidas->size();
+	int numeroElegido;
+	int indiceActual = 0;
+	Salida * salidaElegida;
+
+	srand((unsigned)time(0));
+	numeroElegido = (rand()%cantidadSalidas);
+
+	list<Salida*>::iterator it = this->salidas->begin();
+
+	 while ( it != this->salidas->end())
+	 {
+		 if(indiceActual == numeroElegido)
+		 {
+			 salidaElegida = *it;
+			 break;
+		 }
+
+		 ++it;
+		 indiceActual++;
+	 }
+
+	 return salidaElegida;
+
 }

@@ -18,6 +18,19 @@ Administracion* Administracion::obtenerAdministracion(){
 }
 
 
+float Administracion::getCostoHora()
+{
+	return this->costoHora;
+
+}
+
+void Administracion::setCostoHora(float costo)
+{
+	this->costoHora = costo;
+
+}
+
+
 Administracion::~Administracion()
 {
 	delete this->historial;

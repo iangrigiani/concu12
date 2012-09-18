@@ -1,7 +1,9 @@
 #include "Auto.h"
 
 
-Auto::Auto(){
+Auto::Auto()
+{
+	this->haEntrado = false;
 
 }
 
@@ -23,3 +25,32 @@ Ticket * Auto::getTicket()
 	return this->ticket;
 }
 
+
+void Auto::setHaEntrado(bool haEntrado)
+{
+	this->haEntrado = haEntrado;
+}
+
+
+bool Auto::getHaEntrado()
+{
+	return this->haEntrado;
+}
+
+bool Auto::entrarAlEstacionamiento()
+{
+	//if(Estacionamiento::obtenerEstacionamiento()->getEntradaAleatoria()->registrarEntradaAuto(this))
+		//this->setHaEntrado(true);
+
+	return this->getHaEntrado();
+}
+
+
+bool Auto::salirDelEstacionamiento()
+{
+	//if(Estacionamiento::obtenerEstacionamiento()->getSalidaAleatoria()->registrarSalidaAuto(this))
+		//this->setHaEntrado(false);
+
+	return this->getHaEntrado();
+
+}

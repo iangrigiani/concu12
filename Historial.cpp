@@ -44,6 +44,12 @@ list<Auto*> * Historial::getHistorialDeAutos()
 }
 
 
+int Historial::getCantidadDeAutosEnEstacionamiento()
+{
+	return this->historialDeAutos->size();
+}
+
+
 int Historial::getCantidadDeLugaresDisponibles(){
 
 	return this->cantidadDeLugaresDisponibles;

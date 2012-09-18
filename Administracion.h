@@ -12,6 +12,7 @@ class Administracion
 			Historial * historial;
 			Administracion();
 			static Administracion * administracion;
+			float costoHora;
 
 
 
@@ -19,6 +20,8 @@ class Administracion
 			~Administracion();
 			Historial * getHistorial();
 			static Administracion* obtenerAdministracion();
+			float getCostoHora();
+			void setCostoHora(float costo);
 
 
 

@@ -5,11 +5,22 @@
 
 class Salida {
 
+private:
+		int numeroDeSalida;
+
 
 public:
 
-	Salida() {}
+	Salida(int numeroSalida)
+	{
+		this->numeroDeSalida = numeroSalida;
+
+	}
+
+	int getNumeroDeSalida();
+
 	bool registrarSalidaAuto(Auto * automovil);
+
 	virtual ~Salida() {}
 };
 

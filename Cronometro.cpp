@@ -33,7 +33,7 @@ Cronometro * Cronometro::obtenerCronometro(){
  */
  void Cronometro::iniciarTiempo(){
 
-//		  horaInicial = new Date();
+	 this->horaInicial = new Fecha();
   }
 
 /**
