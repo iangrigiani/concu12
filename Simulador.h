@@ -16,6 +16,8 @@ public:
 	~Simulador();
 	void simular();
 
+	bool entrarAlEstacionamiento(Auto * automovil);
+	bool salirDelEstacionamiento(Auto * automovil);
 
 
 };

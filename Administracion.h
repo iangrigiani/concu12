@@ -13,6 +13,7 @@ class Administracion
 			Administracion();
 			static Administracion * administracion;
 			float costoHora;
+			float importeRecaudado;
 
 
 
@@ -22,6 +23,9 @@ class Administracion
 			static Administracion* obtenerAdministracion();
 			float getCostoHora();
 			void setCostoHora(float costo);
+
+			float getImporteRecaudado();
+			void actualizarImporteRecaudado(int cantidadHoras);
 
 
 

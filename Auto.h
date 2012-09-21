@@ -1,7 +1,6 @@
 #ifndef AUTO_H_
 #define AUTO_H_
 
-//#include "Estacionamiento.h"
 #include "Ticket.h"
 
 class Auto
@@ -10,10 +9,11 @@ class Auto
 
 			Ticket * ticket;
 			bool haEntrado;
+			int horasEstadia;
 
 
 	public:
-			Auto();
+			Auto(int horasEstadia);
 
 			~Auto();
 
@@ -21,15 +21,11 @@ class Auto
 
 			Ticket * getTicket();
 
-			bool entrarAlEstacionamiento();
-
-			bool salirDelEstacionamiento();
-
 			void setHaEntrado(bool haEntrado);
 
 			bool getHaEntrado();
 
-
+			int getHorasEstadia();
 
 };
 
