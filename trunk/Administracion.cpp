@@ -6,7 +6,7 @@
 Administracion::Administracion()
 {
 	this->historial = Historial::obtenerHistorial();
-
+	this->importeRecaudado = 0;
 }
 
 
@@ -42,6 +42,13 @@ Historial * Administracion::getHistorial()
 	return this->historial;
 }
 
+float Administracion::getImporteRecaudado(){
+	return this->importeRecaudado;
+}
+
+void Administracion::actualizarImporteRecaudado(int cantidadHoras){
+	this->importeRecaudado += (this->costoHora * cantidadHoras);
+}
 
 
 

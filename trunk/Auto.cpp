@@ -1,9 +1,10 @@
 #include "Auto.h"
 
 
-Auto::Auto()
+Auto::Auto(int horasEstadia)
 {
 	this->haEntrado = false;
+	this->horasEstadia = horasEstadia;
 
 }
 
@@ -37,20 +38,6 @@ bool Auto::getHaEntrado()
 	return this->haEntrado;
 }
 
-bool Auto::entrarAlEstacionamiento()
-{
-	//if(Estacionamiento::obtenerEstacionamiento()->getEntradaAleatoria()->registrarEntradaAuto(this))
-		//this->setHaEntrado(true);
-
-	return this->getHaEntrado();
-}
-
-
-bool Auto::salirDelEstacionamiento()
-{
-	//if(Estacionamiento::obtenerEstacionamiento()->getSalidaAleatoria()->registrarSalidaAuto(this))
-		//this->setHaEntrado(false);
-
-	return this->getHaEntrado();
-
+int Auto::getHorasEstadia(){
+	return this->horasEstadia;
 }
