@@ -31,66 +31,74 @@ double Simulador::getNumeroAleatorio()
 void Simulador::simular(){
 
 	pid_t w;
-	  /*pid_t pConsola = fork();
-
-	  cout<<"Primer proceso hijo creado "<<endl;
-
-	  if( pConsola != 0)
-	  {*/
-		  this->cronometro->iniciarTiempo();
-		  while (!this->cronometro->llegoAlFinal())
-		  {
-			  srand((unsigned)time(NULL));
-			  double numeroAlearorio = this->getNumeroAleatorio();
-
-			  cout << "numero elegido " << numeroAlearorio << endl;
-			  double flujoDeAutos=this->cronometro->getFlujoDeAutos();
-			  cout << "flujo de autos " << flujoDeAutos << endl;
-			  if ( numeroAlearorio < flujoDeAutos )
-			  {
-					pid_t pAuto = fork();
-
-					if( pAuto ==  0)
-					{
-						cout << "Proceso hijo creado " << getpid() << endl;
-
-						double horasAleatoriasEstadia = this->getNumeroAleatorio();
-						int horas = ceil(50*horasAleatoriasEstadia);
-						Auto * automovil = new Auto(horas);
-						//this->entrarAlEstacionamiento(automovil);
-						automovil->run();
-						//el while del auto
-						//automovil->getTicket()->setPago(true);
-						//this->salirDelEstacionamiento(automovil);
-						delete(automovil);
-						return;
-					} else {
-						this->cantidadAutos++;
-					}
-			  }
-			  sleep(1);
-
-			  cout << "Cantidad de autos: " << this->cantidadAutos << endl;
-		  }
-
-		  cout << "Esperando que terminen todos los procesos..." << endl;
-		  cout << "Cantidad de autos: " << this->cantidadAutos << endl;
-		  while (this->cantidadAutos > 0) {
-			  int estado;
-			  w = wait(&estado);
-			  cout << "Terminado proceso..." << w << endl;
-			  this->cantidadAutos--;
-			  cout << "Cantidad de autos: " << this->cantidadAutos << endl;
-
-		  }
+	pid_t pConsola = fork();
 
 
-	/*}
-	  else
-	  {
-		  //PIPE
-	  	//consola comandos -v y -i.
-	  }*/
+	if( pConsola != 0)
+	{
+		cout << "Creada la consola en el pid " << pConsola << endl;
+		this->cronometro->iniciarTiempo();
+		while (!this->cronometro->llegoAlFinal())
+		{
+			srand((unsigned)time(NULL));
+			double numeroAlearorio = this->getNumeroAleatorio();
+
+			cout << "numero elegido " << numeroAlearorio << endl;
+			double flujoDeAutos=this->cronometro->getFlujoDeAutos();
+			cout << "flujo de autos " << flujoDeAutos << endl;
+			if ( numeroAlearorio < flujoDeAutos )
+			{
+				pid_t pAuto = fork();
+
+				if( pAuto ==  0)
+				{
+					cout << "Proceso hijo creado " << getpid() << endl;
+
+					double horasAleatoriasEstadia = this->getNumeroAleatorio();
+					int horas = ceil(50*horasAleatoriasEstadia);
+					Auto * automovil = new Auto(horas);
+					//this->entrarAlEstacionamiento(automovil);
+					automovil->run();
+					//el while del auto
+					//automovil->getTicket()->setPago(true);
+					//this->salirDelEstacionamiento(automovil);
+					delete(automovil);
+					return;
+				} else {
+					this->cantidadAutos++;
+				}
+			}
+			sleep(1);
+
+			cout << "Cantidad de autos: " << this->cantidadAutos << endl;
+		}
+	}
+	else
+	{
+
+		string texto;
+		cin >> texto;
+
+		cout << "Ingresaste por consola: " << texto << endl;
+		return;
+	  //PIPE
+	//consola comandos -v y -i.
+	}
+
+	cout << "Esperando que terminen todos los procesos..." << endl;
+	cout << "Cantidad de autos: " << this->cantidadAutos << endl;
+	int estado;
+	while (this->cantidadAutos > 0) {
+		w = wait(&estado);
+		cout << "Terminado proceso..." << w << endl;
+		this->cantidadAutos--;
+		cout << "Cantidad de autos: " << this->cantidadAutos << ". Esperando que salgan los demas..." << endl;
+
+	}
+	cout << endl << "Acordate de ingresar algo por teclado pq sino esto no muere mas!! " << endl;
+	waitpid(pConsola, &estado, 0);
+	cout << "Terminado proceso..." << pConsola << endl;
+	cout << "FIN SIMULACION" << endl;
 }
 
 bool Simulador::entrarAlEstacionamiento(Auto * automovil)
