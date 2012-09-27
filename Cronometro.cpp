@@ -3,11 +3,12 @@
 
 
 Cronometro::Cronometro() {
-
+	this->horaInicial = NULL;
+	this->tiempoASimular = 0;
 }
 
 Cronometro::~Cronometro() {
-
+	delete this->horaInicial;
 }
 
 int Cronometro::getTiempoASimular(){
