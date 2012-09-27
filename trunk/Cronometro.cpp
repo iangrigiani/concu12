@@ -41,9 +41,14 @@ Cronometro * Cronometro::obtenerCronometro(){
  * @return double
  */
 double Cronometro::getFlujoDeAutos(){
-//	double x= ((new Date()).getTime()- (Cronometro.horaInicial).getTime())/1000.0;
-//  return (90000.0-(x-300)*(x-300))/90000.0;
-	return 0;
+
+	Fecha * fechaActual = new Fecha();
+
+	double x = ((fechaActual->getTime())-(this->horaInicial->getTime()))/ 1000.0;
+
+	delete fechaActual;
+
+	return (90000.0-(x-300)*(x-300))/90000.0;
 }
 
 /**
@@ -52,9 +57,16 @@ double Cronometro::getFlujoDeAutos(){
  */
 bool Cronometro::llegoAlFinal() {
 
-//	double x= ((new Date()).getTime()- (Cronometro.horaInicial).getTime())/1000.0;
-//	if(x>Cronometro.tiempoASimular) return true;
-	return false;
+	bool retorno = false;
+	Fecha * fechaActual = new Fecha();
+	double x = ((fechaActual->getTime())-(this->horaInicial->getTime()))/ 1000.0;
+
+	delete fechaActual;
+	if(x>this->tiempoASimular)
+		retorno = true;
+
+
+	return retorno;
 }
 
 /**

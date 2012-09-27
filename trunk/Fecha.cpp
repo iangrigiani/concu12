@@ -21,6 +21,21 @@ Fecha::~Fecha() {
 
 }
 
+long Fecha::getTime()
+{
+	  /*1 hora ________ 60 minutos
+	  1 minuto _______60 segundos
+	  1 segundo _______ 1000 milisegundos*/
+
+	 long miliSegundosHora = this->hora*60*60*1000;
+	 long miliSegundosMinuto = this->minutos*60*1000;
+	 long miliSegundosSegundo = this->segundos*1000;
+
+	 long time = miliSegundosHora + miliSegundosMinuto + miliSegundosSegundo;
+
+	 return time;
+}
+
 
 
 void Fecha::mostrarFechaActual(){
