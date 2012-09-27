@@ -23,6 +23,7 @@ public:
 	Fecha();
 	virtual ~Fecha();
 	void mostrarFechaActual();
+	long getTime();
 
 };
 

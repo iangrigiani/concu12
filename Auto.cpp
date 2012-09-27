@@ -5,6 +5,7 @@ Auto::Auto(int horasEstadia)
 {
 	this->haEntrado = false;
 	this->horasEstadia = horasEstadia;
+	this->ticket = NULL;
 
 }
 
@@ -40,4 +41,11 @@ bool Auto::getHaEntrado()
 
 int Auto::getHorasEstadia(){
 	return this->horasEstadia;
+}
+
+
+void Auto::run(){
+
+	cout << "Soy " << getpid() << " y voy a estar estacionado " << this->horasEstadia << " horas" << endl;
+	sleep(this->horasEstadia);
 }

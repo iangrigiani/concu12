@@ -30,7 +30,7 @@ Estacionamiento::~Estacionamiento()
 {
 	//TODO IMPORTANTE!!! tener en cuenta de liberar las listas de entradas
 	//y salidas Y LA ADMINISTRACION
-
+	delete this->administracionDelEstacionamiento;
 }
 
 Estacionamiento * Estacionamiento::estacionamiento = NULL;

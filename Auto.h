@@ -27,6 +27,8 @@ class Auto
 
 			int getHorasEstadia();
 
+			void run();
+
 };
 
 
