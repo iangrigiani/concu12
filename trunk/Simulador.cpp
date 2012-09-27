@@ -63,7 +63,7 @@ void Simulador::simular(){
 						//automovil->getTicket()->setPago(true);
 						//this->salirDelEstacionamiento(automovil);
 						delete(automovil);
-						exit(0);
+						return;
 					} else {
 						this->cantidadAutos++;
 					}

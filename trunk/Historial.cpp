@@ -3,7 +3,7 @@
 
 Historial::Historial() {
 
-	this->historialDeAutos = new list<Auto*>();
+	//this->historialDeAutos = new list<Auto*>();
 
 }
 
@@ -11,7 +11,7 @@ Historial::~Historial() {
 
 	//TODO tener en cuenta de liberar la lista de autos
 
-	delete [] this->historialDeAutos;
+	//delete [] this->historialDeAutos;
 }
 
 

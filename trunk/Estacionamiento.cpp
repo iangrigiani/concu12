@@ -31,6 +31,26 @@ Estacionamiento::~Estacionamiento()
 	//TODO IMPORTANTE!!! tener en cuenta de liberar las listas de entradas
 	//y salidas Y LA ADMINISTRACION
 	delete this->administracionDelEstacionamiento;
+
+	list<Entrada*>::iterator it = this->entradas->begin();
+
+	while ( it != this->entradas->end())
+	{
+		delete *it;
+		++it;
+	}
+
+	list<Salida*>::iterator it2 = this->salidas->begin();
+
+	while ( it2 != this->salidas->end())
+	{
+		delete *it2;
+		++it2;
+	}
+
+	delete this->entradas;
+	delete this->salidas;
+
 }
 
 Estacionamiento * Estacionamiento::estacionamiento = NULL;
