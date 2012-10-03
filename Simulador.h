@@ -4,9 +4,8 @@
 
 
 #include <unistd.h>
-#include <sys/wait.h>
 #include <math.h>
-
+#include <sys/wait.h>
 #include "Cronometro.h"
 #include "Estacionamiento.h"
 
