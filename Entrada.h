@@ -2,7 +2,8 @@
 #ifndef ENTRADA_H_
 #define ENTRADA_H_
 
-#include "Historial.h"
+#include "Administracion.h"
+#include "Auto.h"
 
 class Entrada {
 
@@ -19,7 +20,7 @@ public:
 
 	int getNumeroDeEntrada();
 
-	bool registrarEntradaAuto(Auto * automovil);
+	bool registrarEntradaAuto(Auto * automovil, Administracion * administracion);
 
 	virtual ~Entrada() { }
 };

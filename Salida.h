@@ -1,7 +1,8 @@
 #ifndef SALIDA_H_
 #define SALIDA_H_
 
-#include "Historial.h"
+#include "Administracion.h"
+#include "Auto.h"
 
 class Salida {
 
@@ -19,7 +20,7 @@ public:
 
 	int getNumeroDeSalida();
 
-	bool registrarSalidaAuto(Auto * automovil);
+	bool registrarSalidaAuto(Auto * automovil,Administracion * administracion);
 
 	virtual ~Salida() {}
 };

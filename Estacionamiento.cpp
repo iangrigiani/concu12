@@ -22,7 +22,7 @@ Estacionamiento::Estacionamiento() {
 	this->salidas->push_back(salida2);
 
 	//Llamar a la administracion
-	this->administracionDelEstacionamiento = Administracion::obtenerAdministracion();
+	//this->administracionDelEstacionamiento = Administracion::obtenerAdministracion();
 
 }
 
@@ -30,7 +30,7 @@ Estacionamiento::~Estacionamiento()
 {
 	//TODO IMPORTANTE!!! tener en cuenta de liberar las listas de entradas
 	//y salidas Y LA ADMINISTRACION
-	delete this->administracionDelEstacionamiento;
+	//delete this->administracionDelEstacionamiento;
 
 	list<Entrada*>::iterator it = this->entradas->begin();
 
@@ -67,7 +67,7 @@ Administracion * Estacionamiento::getAdministracion(){
 
 void Estacionamiento::setCantidadDeLugaresDisponibles(int cantidadLugares)
 {
-	this->administracionDelEstacionamiento->getHistorial()->setCantidadLugaresDispobibles(cantidadLugares);
+	//this->administracionDelEstacionamiento->getHistorial()->setCantidadLugaresDispobibles(cantidadLugares);
 }
 
 

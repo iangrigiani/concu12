@@ -5,21 +5,19 @@
 esto debe generar un proceso por cada auto que entra*/
 /*Devuelve true si el auto pudo acceder al estacionamiento*/
 
-bool Entrada::registrarEntradaAuto(Auto * automovil)
+bool Entrada::registrarEntradaAuto(Auto * automovil, Administracion * administracion)
 {
 	bool pudoAcceder = false;
 	//ACA se deberia verificar si el estacionamiento esta o no lleno.
 	//Si el estacionamiento no esta lleno se le permite el ingreso del auto.
-	int cantidadLugares = Historial::obtenerHistorial()->getCantidadDeLugaresDisponibles();
-
-
+	int cantidadLugares = administracion->getCantidadLugaresDisponibles();
 	if(cantidadLugares > 0 && !automovil->getHaEntrado())
 	{
 		Ticket * ticket = new Ticket();
 		automovil->setTicket(ticket);
-		Historial::obtenerHistorial()->agregarNuevoAutoAlHistorial(automovil);
+		administracion->incrementarCantidadAutos();
 		cantidadLugares--;
-		Historial::obtenerHistorial()->setCantidadLugaresDispobibles(cantidadLugares);
+		administracion->decrementarCantidadLugares();
 		pudoAcceder = true;
 	}
 

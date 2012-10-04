@@ -4,8 +4,8 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
+#include <stdlib.h>
 #include "Administracion.h"
 #include "Entrada.h"
 #include "Salida.h"

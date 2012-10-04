@@ -7,20 +7,27 @@
 #include <math.h>
 #include <sys/wait.h>
 #include "Cronometro.h"
-#include "Estacionamiento.h"
+#include "MemoriaCompartida.h"
+#include "Administracion.h"
+#include "Entrada.h"
+#include "Auto.h"
 
 class Simulador
 {
 
 private:
-		Estacionamiento * estacionamiento;
+		//Estacionamiento * estacionamiento;
+		Entrada * entrada;
+		Administracion * administracion;
+		MemoriaCompartida<Administracion> memoria;
 		Cronometro * cronometro;
 		int cantidadAutos;
 		double getNumeroAleatorio();
 
 
 public:
-	Simulador();
+
+	Simulador(int numeroEntrada);
 	~Simulador();
 	void simular();
 	Cronometro * getCronometro();

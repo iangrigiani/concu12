@@ -1,16 +1,13 @@
 #include "Salida.h"
 
 
-bool Salida::registrarSalidaAuto(Auto * automovil)
+bool Salida::registrarSalidaAuto(Auto * automovil, Administracion * administracion)
 {
 	bool pudoSalir = false;
 	//ACA se deberia verificar si el auto pagó el ticket
 	if(automovil->getTicket()->getPago() && automovil->getHaEntrado())
 	{
-		int cantidadLugares = Historial::obtenerHistorial()->getCantidadDeLugaresDisponibles();
-		Historial::obtenerHistorial()->quitarAutoDelHistorial(automovil);
-		cantidadLugares++;
-		Historial::obtenerHistorial()->setCantidadLugaresDispobibles(cantidadLugares);
+		administracion->incrementarCantidadLugares();
 		pudoSalir = true;
 	}
 	return pudoSalir;
