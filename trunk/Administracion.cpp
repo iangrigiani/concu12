@@ -5,16 +5,7 @@
 
 Administracion::Administracion()
 {
-	this->historial = Historial::obtenerHistorial();
 	this->importeRecaudado = 0;
-}
-
-
-Administracion* Administracion::administracion = NULL;
-Administracion* Administracion::obtenerAdministracion(){
-	if(administracion==NULL)
-		administracion=new Administracion();
-	return administracion;
 }
 
 
@@ -31,17 +22,6 @@ void Administracion::setCostoHora(float costo)
 }
 
 
-Administracion::~Administracion()
-{
-	delete this->historial;
-
-}
-
-Historial * Administracion::getHistorial()
-{
-	return this->historial;
-}
-
 float Administracion::getImporteRecaudado(){
 	return this->importeRecaudado;
 }
@@ -49,6 +29,43 @@ float Administracion::getImporteRecaudado(){
 void Administracion::actualizarImporteRecaudado(int cantidadHoras){
 	this->importeRecaudado += (this->costoHora * cantidadHoras);
 }
+
+void Administracion::incrementarCantidadAutos()
+{
+	this->cantidadDeAutos++;
+}
+
+void Administracion::decrementarCantidadAutos()
+{
+	this->cantidadDeAutos++;
+}
+
+
+void Administracion::incrementarCantidadLugares()
+{
+	this->cantidadDeLugaresDisponibles++;
+}
+
+
+void Administracion::decrementarCantidadLugares()
+{
+	this->cantidadDeLugaresDisponibles--;
+}
+
+
+
+int Administracion::getCantidadDeAutos()
+{
+	return this->cantidadDeAutos;
+}
+
+
+int Administracion::getCantidadLugaresDisponibles()
+{
+	return this->cantidadDeLugaresDisponibles;
+}
+
+
 
 
 
