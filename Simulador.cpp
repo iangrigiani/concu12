@@ -4,6 +4,7 @@
 
 Simulador::Simulador(int numeroEntrada)
 {
+	/*
 	//this->estacionamiento = Estacionamiento::obtenerEstacionamiento();
 	this->entrada = new Entrada(numeroEntrada);
 
@@ -25,6 +26,7 @@ Simulador::Simulador(int numeroEntrada)
 
 	this->cronometro =  Cronometro::obtenerCronometro();
 	this->cantidadAutos = 0;
+	*/
 }
 
 

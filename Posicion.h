@@ -8,8 +8,13 @@ private:
 		int numero;
 
 public:
-	Posicion(int numero);
+	Posicion();
 	virtual ~Posicion();
+
+	bool getEstadoOcupado();
+	void setEstadoOcupado(bool estado);
+	int getNumero();
+	void setNumero(int numero);
 };
 
 #endif /* POSICION_H_ */
