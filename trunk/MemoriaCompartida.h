@@ -10,7 +10,7 @@
 #include	<sys/ipc.h>
 #include	<sys/shm.h>
 
-using namespace std;
+
 template <class T> class MemoriaCompartida {
 
 private:
@@ -26,8 +26,8 @@ public:
 	~MemoriaCompartida ();
 	int crear ( char *archivo,char letra );
 	void liberar ();
-	void escribir ( T * dato );
-	T * leer ();
+	void escribir ( T dato );
+	T leer ();
 
 };
 
@@ -43,11 +43,8 @@ template <class T> int MemoriaCompartida<T> :: crear ( char *archivo,char letra 
 
 	// generacion de la clave
 	key_t clave = ftok ( archivo,letra );
-	cout << "CLAVE: " << clave << endl;
 	if ( clave == -1 )
-	{
 		return ERROR_FTOK;
-	}
 	else {
 		// creacion de la memoria compartida
 		this->shmId = shmget ( clave,sizeof(T),0644|IPC_CREAT );
@@ -80,12 +77,12 @@ template <class T> void MemoriaCompartida<T> :: liberar () {
 	}
 }
 
-template <class T> void MemoriaCompartida<T> :: escribir ( T * dato ) {
-	this->ptrDatos = dato;
+template <class T> void MemoriaCompartida<T> :: escribir ( T dato ) {
+	* (this->ptrDatos) = dato;
 }
 
-template <class T> T * MemoriaCompartida<T> :: leer () {
-	return this->ptrDatos;
+template <class T> T MemoriaCompartida<T> :: leer () {
+	return ( *(this->ptrDatos) );
 }
 
 template <class T> int MemoriaCompartida<T> :: cantidadProcesosAdosados () {
