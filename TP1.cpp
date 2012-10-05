@@ -16,7 +16,7 @@ int main() {
 	pid_t pEntrada2;
 	pid_t pEntrada3;
 
-	int cantPosiciones = 10;
+	int cantPosiciones = 50;
 
 
 	//cout << "Creada la consola en el pid " << pConsola << endl;
@@ -61,8 +61,15 @@ int main() {
 			cout << "Padre: escribo el numero " << i << endl;
 			posicion.setNumero(i);
 			posicion.setEstadoOcupado(true);
+			memoria = vectorMemoria[i];
 			memoria.escribir(posicion);
 
+		}
+
+		for (i=0;i<cantPosiciones;i++){
+			memoria = vectorMemoria[i];
+			Posicion posi = memoria.leer();
+			cout << "nmr: " << posi.getNumero() << " estado " << posi.getEstadoOcupado() << endl;
 		}
 
 			// libera la memoria
@@ -127,7 +134,7 @@ int main() {
 	{
 
 		cout << "Hijo: duermo 5 segundos..." << endl;
-		sleep ( 15 );
+		sleep ( 20 );
 
 		int i;
 
