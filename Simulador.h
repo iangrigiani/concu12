@@ -6,9 +6,10 @@
 #include <unistd.h>
 #include <math.h>
 #include <sys/wait.h>
+#include <vector>
+#include <sstream>
 #include "Cronometro.h"
 #include "MemoriaCompartida.h"
-#include "Administracion.h"
 #include "Entrada.h"
 #include "Auto.h"
 
@@ -16,13 +17,13 @@ class Simulador
 {
 
 private:
-		//Estacionamiento * estacionamiento;
-		Entrada * entrada;
-		Administracion * administracion;
-		MemoriaCompartida<Administracion> memoria;
-		Cronometro * cronometro;
-		int cantidadAutos;
-		double getNumeroAleatorio();
+
+	Entrada * entrada;
+	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
+	Cronometro * cronometro;
+	int cantidadAutos;
+
+	double getNumeroAleatorio();
 
 
 public:

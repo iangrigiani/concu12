@@ -10,7 +10,7 @@ bool Entrada::registrarEntradaAuto(Auto * automovil, Administracion * administra
 	bool pudoAcceder = false;
 	//ACA se deberia verificar si el estacionamiento esta o no lleno.
 	//Si el estacionamiento no esta lleno se le permite el ingreso del auto.
-	int cantidadLugares = administracion->getCantidadLugaresDisponibles();
+	/*int cantidadLugares = administracion->getCantidadLugaresDisponibles();
 	if(cantidadLugares > 0 && !automovil->getHaEntrado())
 	{
 		Ticket * ticket = new Ticket();
@@ -21,7 +21,8 @@ bool Entrada::registrarEntradaAuto(Auto * automovil, Administracion * administra
 		pudoAcceder = true;
 	}
 
-	return pudoAcceder;
+	return pudoAcceder;*/
+	return false;
 }
 
 

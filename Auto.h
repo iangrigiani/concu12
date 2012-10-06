@@ -1,15 +1,16 @@
 #ifndef AUTO_H_
 #define AUTO_H_
 
-#include "Ticket.h"
+#include <iostream>
+using namespace std;
 
 class Auto
 {
 	private:
 
-			Ticket * ticket;
 			bool haEntrado;
 			int horasEstadia;
+			int numeroPosicion;
 
 
 	public:
@@ -17,15 +18,16 @@ class Auto
 
 			~Auto();
 
-			void setTicket(Ticket * ticket);
-
-			Ticket * getTicket();
-
 			void setHaEntrado(bool haEntrado);
 
 			bool getHaEntrado();
 
 			int getHorasEstadia();
+
+
+			int getNumeroPosicion();
+
+			void setNumeroPosicion(int numero);
 
 			void run();
 

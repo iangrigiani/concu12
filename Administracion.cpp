@@ -41,29 +41,12 @@ void Administracion::decrementarCantidadAutos()
 }
 
 
-void Administracion::incrementarCantidadLugares()
-{
-	this->cantidadDeLugaresDisponibles++;
-}
-
-
-void Administracion::decrementarCantidadLugares()
-{
-	this->cantidadDeLugaresDisponibles--;
-}
-
-
 
 int Administracion::getCantidadDeAutos()
 {
 	return this->cantidadDeAutos;
 }
 
-
-int Administracion::getCantidadLugaresDisponibles()
-{
-	return this->cantidadDeLugaresDisponibles;
-}
 
 
 
