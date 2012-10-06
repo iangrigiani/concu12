@@ -6,30 +6,40 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <vector>
+#include <sys/wait.h>
+#include <sstream>
 #include "Administracion.h"
 #include "Entrada.h"
 #include "Salida.h"
+#include "Simulador.h"
+#include "Fifo.h"
+
 using namespace std;
 
 class Estacionamiento {
 
 private:
 
-	list<Entrada*> * entradas;
-	list<Salida*> * salidas;
-	Administracion * administracionDelEstacionamiento;
-	static Estacionamiento * estacionamiento;
-	Estacionamiento();
+	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
+	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosicionesLibres;
+	MemoriaCompartida<Administracion> administracion;
+
+	void crearArchivosTemporales(int cantidadLugares);
+	void eliminarArchivosTemporales(int cantidadLugares);
+	void crearMemoriaCompartidaPosiciones(int cantidadLugares);
+	void crearMemoriaCompartidaPosicionesLibres(int cantidadLugares);
+	void crearMemoriaCompartidaAdministracion(int costoHora);
+
+
 
 public:
 
+	Estacionamiento();
+
 	virtual ~Estacionamiento();
 
-	static Estacionamiento* obtenerEstacionamiento();
-
-	void setCantidadDeLugaresDisponibles(int cantidadLugares);
-
-	Administracion * getAdministracion();
+	void run(int cantidadDeLugares, int costoHora, int tiempoEjecucion);
 
 	Entrada * getEntradaAleatoria();
 

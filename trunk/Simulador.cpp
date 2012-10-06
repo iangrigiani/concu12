@@ -4,37 +4,16 @@
 
 Simulador::Simulador(int numeroEntrada)
 {
-	/*
-	//this->estacionamiento = Estacionamiento::obtenerEstacionamiento();
 	this->entrada = new Entrada(numeroEntrada);
-
-	int estadoMemoria = this->memoria.crear ( (char*) "TP1.cpp",'R' );
-
-	cout << "Hijo: duermo 5 segundos..." << endl;
-	sleep ( 5 );
-
-	cout<<"Antes del IF"<<endl;
-	if ( estadoMemoria == SHM_OK ) {
-		cout<<"Estoy en el IF"<<endl;
-		this->administracion= (Administracion *)memoria.leer();
-
-		//cout << "Hijo: leo el numero " << prueba1.entero << " y el numero " << prueba1.entero2 <<" de la memoria compartida" << endl;
-	} else {
-		cout<<"Estoy en el ELSE"<<endl;
-		cout << "Hijo: error en memoria compartida: " << estadoMemoria << endl;
-	}
-
 	this->cronometro =  Cronometro::obtenerCronometro();
 	this->cantidadAutos = 0;
-	*/
+
 }
 
 
 Simulador::~Simulador(){
 
-	//delete this->estacionamiento;
 	delete this->cronometro;
-	this->memoria.liberar();
 
 }
 
@@ -90,9 +69,41 @@ void Simulador::simular(){
 
 				delete(automovil);
 				return;
-			} else {
-				// Entrada tiene que chequear si hay lugar disponible y lockear una ubicacion
-				this->cantidadAutos++;
+			}
+			else
+			{
+				//Enviar un mensaje al padre para pedir una posicion libre
+				//el padre le devuelve la posicion libre del vector posiciones
+				//si es que existe u false en otro caso
+				/*
+				if(tamanioVector > 0)
+				{
+					/*int numeroElegido;
+					srand((unsigned)time(0));
+					numeroElegido = (rand()%tamanioVector);
+
+					//Agregar semaforo para sincronizar el acceso
+
+					MemoriaCompartida<Posicion> memoriaLibre = this->vectorMemoriaPosicionesLibres[numero];
+
+
+					Posicion posicionLibre =(Posicion)memoriaLibre.leer();
+
+					MemoriaCompartida<Posicion> memoriaPosicion = this->vectorMemoriaPosiciones[posicionLibre.getNumero()];
+					Posicion posicion = (Posicion)memoriaPosicion.leer();
+
+					//Si esta ocupado tiene que buscar otro libre sino cambiarle el estado
+					if(!posicion.getEstadoOcupado())
+					{
+						posicion.setEstadoOcupado(true);
+						memoriaPosicion.escribir(posicion);
+					}
+				}
+				else
+				{
+
+					//Enviar mensaje al auto diciendo que no hay lugar y que se tiene que ir
+				}*/
 			}
 		}
 		sleep(1);

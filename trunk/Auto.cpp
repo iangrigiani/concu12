@@ -5,28 +5,24 @@ Auto::Auto(int horasEstadia)
 {
 	this->haEntrado = false;
 	this->horasEstadia = horasEstadia;
-	this->ticket = NULL;
-
+	this->numeroPosicion = 0;
 }
 
 
 Auto::~Auto()
 {
-	delete this->ticket;
 
 }
 
-
-void Auto::setTicket(Ticket * ticket)
+int Auto::getNumeroPosicion()
 {
-	this->ticket = ticket;
+	return this->numeroPosicion;
 }
 
-Ticket * Auto::getTicket()
+void Auto::setNumeroPosicion(int numero)
 {
-	return this->ticket;
+	this->numeroPosicion = numero;
 }
-
 
 void Auto::setHaEntrado(bool haEntrado)
 {

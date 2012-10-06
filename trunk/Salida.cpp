@@ -5,9 +5,9 @@ bool Salida::registrarSalidaAuto(Auto * automovil, Administracion * administraci
 {
 	bool pudoSalir = false;
 	//ACA se deberia verificar si el auto pagó el ticket
-	if(automovil->getTicket()->getPago() && automovil->getHaEntrado())
+	if(automovil->getHaEntrado())
 	{
-		administracion->incrementarCantidadLugares();
+		//administracion->incrementarCantidadLugares();
 		pudoSalir = true;
 	}
 	return pudoSalir;

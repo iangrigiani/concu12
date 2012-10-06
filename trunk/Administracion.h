@@ -20,9 +20,7 @@ class Administracion
 			float costoHora;
 			float importeRecaudado;
 			int cantidadDeAutos;
-			int cantidadDeLugaresDisponibles;
-			list<Posicion> libres;
-			list<Posicion> ocupados;
+
 
 
 
@@ -44,13 +42,8 @@ class Administracion
 
 			void actualizarImporteRecaudado(int cantidadHoras);
 
-			int getCantidadLugaresDisponibles();
-
 			void decrementarCantidadAutos();
 
-			void incrementarCantidadLugares();
-
-			void decrementarCantidadLugares();
 
 
 };
