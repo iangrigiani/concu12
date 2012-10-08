@@ -26,8 +26,6 @@ public:
 
 	bool llegoAlFinal();
 
-	void pausaAleatoria(long milisegundos);
-
 	int getTiempoASimular();
 
 	void setTiempoASimular(int tiempo);

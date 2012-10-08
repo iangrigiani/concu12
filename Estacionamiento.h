@@ -13,6 +13,9 @@
 #include "Entrada.h"
 #include "Salida.h"
 #include "Simulador.h"
+#include "Utils.h"
+#include "Constantes.h"
+#include "Log.h"
 #include "Pipe.h"
 
 using namespace std;
