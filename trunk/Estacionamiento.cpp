@@ -212,10 +212,10 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 {
 		// Pipe para la comunicacion de todas las entradas y la consola con el proceso principal. Todos escriben
 		// ahi y el proceso principal solo lee
-		Pipe pipePpal;
+
 
 		// Pipe para responder las consultas de la consola
-		Pipe pipeConsola;
+
 
 		pid_t pConsola = fork();
 
@@ -234,14 +234,14 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 			mensajeLog << "Soy el proceso principal";
 
 			Log::getInstance()->loguear(mensajeLog.str());
-
+/*
 			this->crearArchivosTemporales(cantidadDeLugares);
 
 			this->crearMemoriaCompartidaPosiciones(cantidadDeLugares);
 			this->crearMemoriaCompartidaPosicionesLibres(cantidadDeLugares);
 			this->crearMemoriaCompartidaAdministracion(costoHora);
+*/
 
-			Pipe pipeEntrada1;
 
 			//Proceso padre
 			pEntrada1 = fork();
@@ -255,11 +255,11 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 
 				Log::getInstance()->loguear(mensajeLog.str());
 
-				//correrSimulador(1, tiempoEjecucion);
+				correrSimulador(1, tiempoEjecucion, this->pipeEntrada1);
 			}
 			else
 			{
-				Pipe pipeEntrada2;
+
 				pEntrada2 = fork();
 
 				if( pEntrada2 == 0)
@@ -269,11 +269,11 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 					mensajeLog << "Soy el proceso entrada 2";
 					Log::getInstance()->loguear(mensajeLog.str());
 
-					//correrSimulador(2, tiempoEjecucion);
+					correrSimulador(2, tiempoEjecucion, this->pipeEntrada2);
 				}
 				else
 				{
-					Pipe pipeEntrada3;
+
 					pEntrada3 = fork();
 
 					if( pEntrada3 == 0)
@@ -283,7 +283,7 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 						mensajeLog << "Soy el proceso entrada 3";
 						Log::getInstance()->loguear(mensajeLog.str());
 
-						//correrSimulador(3, tiempoEjecucion);
+						correrSimulador(3, tiempoEjecucion, this->pipeEntrada3);
 					}
 					else {
 						// Proceso principal (funciona como servidor de mensajes)
@@ -296,7 +296,7 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 						char recibido[BUFFSIZE];
 						while (!salir)
 						{
-							int bytes = pipePpal.leer(recibido, BUFFSIZE);
+							int bytes = this->pipePpal.leer(recibido, BUFFSIZE);
 							recibido[bytes] = '\0';
 
 							cout << "ProcPrincipal: acabo de recibir: " << recibido << endl;
@@ -307,47 +307,46 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 							{
 								case 'a': {
 									cout << "Ingreso una a" << endl;
-									pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+									retorno << "te devuelvo la cantidad de autos...";
+									this->pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
 									break;
 								}
 								case 'm': {
 									cout << "Ingreso una m" << endl;
-									pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+									retorno << "te devuelvo el monto facturado...";
+									this->pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
 									break;
 								}
 								case 'q': {
 									cout << "Ingreso un q" << endl;
 									salir = true;
+									this->pipeConsola.cerrar();
 									break;
 								}
-								case '1': {
-									cout << "Entrada 1 pide una posicion" << endl;
-									int nroEntrada;
-									//nroEntrada = getEntradaAleatoria();
-									retorno << nroEntrada;
-									pipeEntrada1.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-									break;
-								}
-								case '2': {
-									cout << "Entrada 1 pide una posicion" << endl;
-									int nroEntrada;
-									//nroEntrada = getEntradaAleatoria();
-
-									retorno << nroEntrada;
-									pipeEntrada2.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-									break;
-								}
-								case '3': {
-									cout << "Entrada 1 pide una posicion" << endl;
-									int nroEntrada;
-									//nroEntrada = getEntradaAleatoria();
-
-									retorno << nroEntrada;
-									pipeEntrada3.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+								case 's': {
+									char * token = strtok(recibido, "|");
+									token = strtok(NULL, "|");
+									cout << "Saco del vector de posiciones libres la posicion: " << token << endl;
 									break;
 								}
 								default: {
-									cout << "Comando invalido" << endl;
+									if ( recibido[0] > '0' && recibido[0] < '4') {
+										int nroPosicion;
+										nroPosicion = calcularRandom(cantidadDeLugares);
+										cout << "Entrada " << recibido[0] << " pide una posicion, le envio: " << nroPosicion << endl;
+										retorno << nroPosicion;
+										if (recibido[0] == '1'){
+											this->pipeEntrada1.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+										} else {
+											if (recibido[0] == '2') {
+												this->pipeEntrada2.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+											} else {
+												this->pipeEntrada3.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+											}
+										}
+									} else {
+										cout << "Comando invalido" << endl;
+									}
 									break;
 								}
 							}
@@ -355,13 +354,17 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 
 						int estado;
 						cout << endl << "Acordate de ingresar Q por teclado pq sino esto no muere mas!! " << endl;
+						cout << "Pconsola es...: " << pConsola << endl;
 						waitpid(pConsola, &estado, 0);
 						waitpid(pEntrada1, &estado, 0);
 						waitpid(pEntrada2, &estado, 0);
 						waitpid(pEntrada3, &estado, 0);
 
+						this->pipeEntrada1.cerrar();
+						this->pipeEntrada2.cerrar();
+						this->pipeEntrada3.cerrar();
 						int i;
-
+/*
 						for (i=0;i<cantidadDeLugares;i++)
 						{
 							MemoriaCompartida<Posicion> memoriaPosicion;
@@ -374,7 +377,8 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 						}
 
 						this->eliminarArchivosTemporales(cantidadDeLugares);
-
+*/
+						pipePpal.cerrar();
 						cout << "Terminado proceso..." << pConsola << endl;
 						cout << "FIN SIMULACION" << endl;
 					}
@@ -392,45 +396,54 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 			Log::getInstance()->loguear(mensajeLog.str());
 
 			char entradaConsola[BUFFSIZE];
-			entradaConsola[0] = '\0';
 
+			bool salir = false;
 			// Para terminar el programa, el usuario debe escribir 'Q' o 'q'
-			while (tolower(entradaConsola[0]) != 'q') {
+			while (!salir) {
+				entradaConsola[0] = '\0';
 				cout << "ProcConsola: Me quedo esperando que ingreses algo por consola..." << endl;
 				cin.getline(entradaConsola, BUFFSIZE);
 
 				// Aca hay que agregar la validacion para que solo pueda ingresar una letra para hacer consultas
 				// o para salir
-				pipePpal.escribir(entradaConsola,BUFFSIZE);
+				this->pipePpal.escribir(entradaConsola,BUFFSIZE);
 
-				if (entradaConsola[0] != 'Q') {
+				if (entradaConsola[0] != 'q' && entradaConsola[0] != 'Q') {
+
 					char recibir[BUFFSIZE];
-					int bytes = pipeConsola.leer(recibir, BUFFSIZE);
+					int bytes = this->pipeConsola.leer(recibir, BUFFSIZE);
 					recibir[bytes] = '\0';
 
 					cout << "ProcConsola: acabo de recibir como rta: " << recibir << endl;
 
 					cout << "ProcConsola: En la variable de consola hay: " << entradaConsola << endl;
+				} else {
+					salir = true;
 				}
 			}
 
-			exit(0);
+			this->pipeConsola.cerrar();
+			this->pipePpal.cerrar();
+			cout << "Me rajo antes que muera... soy: " << getpid() << endl;
+			return;
 		}
 }
 
 
 
 
-void Estacionamiento::correrSimulador(int numeroEntrada, int tiempoEjecucion)
+void Estacionamiento::correrSimulador(int numeroEntrada, int tiempoEjecucion, Pipe pipeEntrada)
 {
 	Simulador * simulador;
 
 	simulador = new Simulador(numeroEntrada);
 
 	simulador->getCronometro()->setTiempoASimular(tiempoEjecucion);
-
+	simulador->setPipePrincipal(this->pipePpal);
+	simulador->setPipeEntrada(pipeEntrada);
 	simulador->simular();
 
+	pipeEntrada.cerrar();
 	delete simulador;
 }
 
