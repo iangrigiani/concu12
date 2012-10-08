@@ -1,7 +1,5 @@
 #include "Estacionamiento.h"
 #define BUFFSIZE		100
-#define	ARCHIVO_FIFO_LECTURA	"/tmp/archivo_fifo_lectura"
-#define ARCHIVO_FIFO_ESCRITURA	"/tmp/archivo_fifo_escritura"
 
 
 Estacionamiento::Estacionamiento() {
@@ -199,13 +197,21 @@ void Estacionamiento::crearMemoriaCompartidaAdministracion(int costoHora)
 
 void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecucion)
 {
+	// Pipe para la comunicacion de todas las entradas y la consola con el proceso principal. Todos escriben
+	// ahi y el proceso principal solo lee
+	Pipe pipePpal;
+
+	// Pipe para responder las consultas de la consola
+	Pipe pipeConsola;
+
 	pid_t pConsola = fork();
-	Simulador * simulador;
+
 	pid_t pEntrada1;
 	pid_t pEntrada2;
 	pid_t pEntrada3;
-	pid_t pSalida1;
-	pid_t pSalida2;
+
+//	pid_t pSalida1;
+//	pid_t pSalida2;
 
 	if( pConsola != 0)
 	{
@@ -216,161 +222,172 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 		this->crearMemoriaCompartidaPosicionesLibres(cantidadDeLugares);
 		this->crearMemoriaCompartidaAdministracion(costoHora);
 
-		stringstream posicionElegida;
-
-		char buffer [ BUFFSIZE ];
-		Fifo canalLectura (ARCHIVO_FIFO_ESCRITURA);
-		Fifo canalEscritura (ARCHIVO_FIFO_LECTURA);
-
-		int bytesLeidos = canalLectura.leer ( buffer,BUFFSIZE );
-		buffer[bytesLeidos] = '\0';
-		cout << "Lector: lei el dato [" << buffer << "] del fifo" << endl;
-
-		canalLectura.cerrar ();
-
-		//Busco una posicion libre aleatoria
-		int tamanioVector = this->vectorMemoriaPosicionesLibres.size();
-		srand((unsigned)time(0));
-		int numeroElegido = (rand()%tamanioVector);
-
-		posicionElegida<<numeroElegido;
-
-		char *posicion = (char*) posicionElegida.str().c_str();
-
-		canalEscritura.escribir ( posicion, strlen(posicion) );
-
-		cout << "Escritor: escribo el dato [" << posicion << "] en el fifo" << endl;
-
-		canalEscritura.cerrar();
-
-		canalEscritura.eliminar ();
-
-		canalLectura.eliminar();
-
-
-		/*bytesLeidos = canal.leer ( buffer,BUFFSIZE );
-		buffer[bytesLeidos] = '\0';
-		cout << "Lector: lei el dato [" << buffer << "] del fifo" << endl;
-		 */
+		Pipe pipeEntrada1;
 
 		//Proceso padre
-		/*pEntrada1 = fork();
+		pEntrada1 = fork();
 
 		if( pEntrada1 != 0)
 		{
 			//Proceso entrada 1
-			simulador = new Simulador(1);
-
-			simulador->getCronometro()->setTiempoASimular(tiempoEjecucion);
-
-			simulador->simular();
-
-			delete simulador;
-
+			correrSimulador(1, tiempoEjecucion);
 		}
 		else
 		{
+			Pipe pipeEntrada2;
 			pEntrada2 = fork();
 
 			if( pEntrada2 != 0)
 			{
-				//Proceso entrada2
-
-				simulador = new Simulador(2);
-
-				simulador->getCronometro()->setTiempoASimular(tiempoEjecucion);
-
-				simulador->simular();
-
-				delete simulador;
-
+				//Proceso entrada 2
+				correrSimulador(2, tiempoEjecucion);
 			}
 			else
 			{
+				Pipe pipeEntrada3;
 				pEntrada3 = fork();
 
 				if( pEntrada3 != 0)
 				{
-					//Proceso entrada3
-
-					simulador = new Simulador(3);
-
-					simulador->getCronometro()->setTiempoASimular(tiempoEjecucion);
-
-					simulador->simular();
-
-					delete simulador;
-
+					//Proceso entrada 3
+					correrSimulador(3, tiempoEjecucion);
 				}
-				else {}
+				else {
+					// Proceso principal (funciona como servidor de mensajes)
+
+					bool salir = false;
+					char recibido[BUFFSIZE];
+					while (!salir)
+					{
+						int bytes = pipePpal.leer(recibido, BUFFSIZE);
+						recibido[bytes] = '\0';
+
+						cout << "ProcPrincipal: acabo de recibir: " << recibido << endl;
+
+						stringstream retorno;
+
+						switch (recibido[0])
+						{
+							case 'a': {
+								cout << "Ingreso una a" << endl;
+								pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+								break;
+							}
+							case 'm': {
+								cout << "Ingreso una m" << endl;
+								pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+								break;
+							}
+							case 'q': {
+								cout << "Ingreso un q" << endl;
+								salir = true;
+								break;
+							}
+							case '1': {
+								cout << "Entrada 1 pide una posicion" << endl;
+								int nroEntrada;
+								//nroEntrada = getEntradaAleatoria();
+								retorno << nroEntrada;
+								pipeEntrada1.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+								break;
+							}
+							case '2': {
+								cout << "Entrada 1 pide una posicion" << endl;
+								int nroEntrada;
+								//nroEntrada = getEntradaAleatoria();
+
+								retorno << nroEntrada;
+								pipeEntrada2.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+								break;
+							}
+							case '3': {
+								cout << "Entrada 1 pide una posicion" << endl;
+								int nroEntrada;
+								//nroEntrada = getEntradaAleatoria();
+
+								retorno << nroEntrada;
+								pipeEntrada3.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+								break;
+							}
+							default: {
+								cout << "Comando invalido" << endl;
+								break;
+							}
+						}
+					}
+
+					int estado;
+					cout << endl << "Acordate de ingresar Q por teclado pq sino esto no muere mas!! " << endl;
+					waitpid(pConsola, &estado, 0);
+					waitpid(pEntrada1, &estado, 0);
+					waitpid(pEntrada2, &estado, 0);
+					waitpid(pEntrada3, &estado, 0);
+
+					int i;
+
+					for (i=0;i<cantidadDeLugares;i++)
+					{
+						MemoriaCompartida<Posicion> memoriaPosicion;
+						memoriaPosicion = this->vectorMemoriaPosiciones[i];
+						memoriaPosicion.liberar();
+
+						MemoriaCompartida<Posicion> memoriaLibres;
+						memoriaLibres = this->vectorMemoriaPosicionesLibres[i];
+						memoriaLibres.liberar();
+					}
+
+					this->eliminarArchivosTemporales(cantidadDeLugares);
+
+					cout << "Terminado proceso..." << pConsola << endl;
+					cout << "FIN SIMULACION" << endl;
+				}
 			}
 
 		}
-*/
+
 	}
 	else
 	{
-		//Enviar fifo para recibir una posicion libre
+		// Proceso consola
+		char entradaConsola[BUFFSIZE];
+		entradaConsola[0] = '\0';
 
-		char buffer [ BUFFSIZE ];
-		char *posicion = (char *) "Quiero una posicion\0";
-		Fifo canalEscritura ( ARCHIVO_FIFO_ESCRITURA );
-		Fifo canalLectura (ARCHIVO_FIFO_LECTURA);
+		// Para terminar el programa, el usuario debe escribir 'Q' o 'q'
+		while (tolower(entradaConsola[0]) != 'q') {
+			cout << "ProcConsola: Me quedo esperando que ingreses algo por consola..." << endl;
+			cin.getline(entradaConsola, BUFFSIZE);
 
-		canalEscritura.escribir ( posicion, strlen(posicion) );
-		cout << "Escritor: escribo el dato [" << posicion << "] en el fifo" << endl;
+			// Aca hay que agregar la validacion para que solo pueda ingresar una letra para hacer consultas
+			// o para salir
+			pipePpal.escribir(entradaConsola,BUFFSIZE);
 
-		canalEscritura.cerrar ();
+			if (entradaConsola[0] != 'Q') {
+				char recibir[BUFFSIZE];
+				int bytes = pipeConsola.leer(recibir, BUFFSIZE);
+				recibir[bytes] = '\0';
 
-		//Espero a que responda
-		sleep(10);
+				cout << "ProcConsola: acabo de recibir como rta: " << recibir << endl;
 
-		int bytesLeidos = canalLectura.leer ( buffer,BUFFSIZE );
-		buffer[bytesLeidos] = '\0';
-		cout << "Lector: lei el dato [" << buffer << "] del fifo" << endl;
+				cout << "ProcConsola: En la variable de consola hay: " << entradaConsola << endl;
+			}
+		}
 
-		canalLectura.cerrar();
-
-		//Proceso consola
-
-		string texto;
-		cin >> texto;
-
-		cout << "Ingresaste por consola: " << texto << endl;
-
-
+		exit(0);
 	}
-
-	int estado;
-	cout << endl << "Acordate de ingresar algo por teclado pq sino esto no muere mas!! " << endl;
-	waitpid(pConsola, &estado, 0);
-	//waitpid(pEntrada1, &estado, 0);
-	//waitpid(pEntrada2, &estado, 0);
-	//waitpid(pEntrada3, &estado, 0);
-
-	int i;
-
-	for (i=0;i<cantidadDeLugares;i++)
-	{
-		MemoriaCompartida<Posicion> memoriaPosicion;
-		memoriaPosicion = this->vectorMemoriaPosiciones[i];
-		memoriaPosicion.liberar();
-
-		MemoriaCompartida<Posicion> memoriaLibres;
-		memoriaLibres = this->vectorMemoriaPosicionesLibres[i];
-		memoriaLibres.liberar();
-	}
-
-	this->eliminarArchivosTemporales(cantidadDeLugares);
-
-	cout << "Terminado proceso..." << pConsola << endl;
-	cout << "FIN SIMULACION" << endl;
-
-
-
 }
 
+void Estacionamiento::correrSimulador(int numeroEntrada, int tiempoEjecucion)
+{
+	Simulador * simulador;
 
+	simulador = new Simulador(numeroEntrada);
+
+	simulador->getCronometro()->setTiempoASimular(tiempoEjecucion);
+
+	simulador->simular();
+
+	delete simulador;
+}
 
 Entrada * Estacionamiento::getEntradaAleatoria()
 {

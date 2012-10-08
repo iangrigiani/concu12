@@ -13,7 +13,7 @@
 #include "Entrada.h"
 #include "Salida.h"
 #include "Simulador.h"
-#include "Fifo.h"
+#include "Pipe.h"
 
 using namespace std;
 
@@ -30,6 +30,7 @@ private:
 	void crearMemoriaCompartidaPosiciones(int cantidadLugares);
 	void crearMemoriaCompartidaPosicionesLibres(int cantidadLugares);
 	void crearMemoriaCompartidaAdministracion(int costoHora);
+	void correrSimulador(int numeroEntrada, int tiempoEjecucion);
 
 
 
