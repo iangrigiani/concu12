@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
 	Log::getInstance()->setModoDebug( true );
 
 	Parametros parametros;
+
+
 	if ( ( retorno = validarParametros( argc, argv, &parametros ) ) == 0 )
 	{
 			Log::getInstance()->loguear( string ( argv[ 0 ] ) + " " + getStringParametros( &parametros ) );

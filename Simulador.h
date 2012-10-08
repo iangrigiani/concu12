@@ -12,6 +12,8 @@
 #include "MemoriaCompartida.h"
 #include "Entrada.h"
 #include "Auto.h"
+#include "Pipe.h"
+#include "Constantes.h"
 
 class Simulador
 {
@@ -22,6 +24,8 @@ private:
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
 	Cronometro * cronometro;
 	int cantidadAutos;
+	Pipe pipePpal;
+	Pipe pipeEntrada;
 
 	double getNumeroAleatorio();
 
@@ -31,6 +35,13 @@ public:
 	Simulador(int numeroEntrada);
 	~Simulador();
 	void simular();
+
+	void setPipePrincipal(Pipe pipePrincipal);
+	Pipe getPipePrincipal();
+	void setPipeEntrada(Pipe pipeEntrada);
+	Pipe getPipeEntrada();
+
+
 	Cronometro * getCronometro();
 
 	bool entrarAlEstacionamiento(Auto * automovil);

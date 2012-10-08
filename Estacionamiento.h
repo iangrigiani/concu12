@@ -28,12 +28,18 @@ private:
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosicionesLibres;
 	MemoriaCompartida<Administracion> administracion;
 
+	Pipe pipeConsola;
+	Pipe pipePpal;
+	Pipe pipeEntrada1;
+	Pipe pipeEntrada2;
+	Pipe pipeEntrada3;
+
 	void crearArchivosTemporales(int cantidadLugares);
 	void eliminarArchivosTemporales(int cantidadLugares);
 	void crearMemoriaCompartidaPosiciones(int cantidadLugares);
 	void crearMemoriaCompartidaPosicionesLibres(int cantidadLugares);
 	void crearMemoriaCompartidaAdministracion(int costoHora);
-	void correrSimulador(int numeroEntrada, int tiempoEjecucion);
+	void correrSimulador(int numeroEntrada, int tiempoEjecucion, Pipe pipeEntrada);
 
 
 
