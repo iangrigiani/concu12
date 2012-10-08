@@ -70,13 +70,6 @@ bool Cronometro::llegoAlFinal() {
 	return retorno;
 }
 
-/**
- * Metodo que genera una pausa aleatoria en el proceso actual.
- * @param milisegundos
- */
-void Cronometro::pausaAleatoria(long milisegundos) {
-	//Thread.sleep((long)(milisegundos*Math.random()));
-}
 
 
 
