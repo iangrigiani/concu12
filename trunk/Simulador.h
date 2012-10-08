@@ -14,6 +14,7 @@
 #include "Auto.h"
 #include "Pipe.h"
 #include "Constantes.h"
+#include "Utils.h"
 
 class Simulador
 {

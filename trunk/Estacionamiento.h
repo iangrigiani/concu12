@@ -34,6 +34,9 @@ private:
 	Pipe pipeEntrada2;
 	Pipe pipeEntrada3;
 
+	int montoTotal;
+
+
 	void crearArchivosTemporales(int cantidadLugares);
 	void eliminarArchivosTemporales(int cantidadLugares);
 	void crearMemoriaCompartidaPosiciones(int cantidadLugares);
