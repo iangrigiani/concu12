@@ -3,8 +3,7 @@
 
 
 Estacionamiento::Estacionamiento() {
-
-
+	this->montoTotal = 0;
 }
 
 
@@ -313,7 +312,7 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 								}
 								case 'm': {
 									cout << "Ingreso una m" << endl;
-									retorno << "te devuelvo el monto facturado...";
+									retorno << this->montoTotal;
 									this->pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
 									break;
 								}
@@ -327,6 +326,15 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 									char * token = strtok(recibido, "|");
 									token = strtok(NULL, "|");
 									cout << "Saco del vector de posiciones libres la posicion: " << token << endl;
+									break;
+								}
+								case 'h': {
+									// Actualizo el monto total recaudado
+									char * token = strtok(recibido, "|");
+									token = strtok(NULL, "|");
+									int horas = atoi(token);
+									this->montoTotal += horas*costoHora;
+									cout << "Sumo al monto total: " << horas*costoHora << endl;
 									break;
 								}
 								default: {
@@ -416,7 +424,6 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 
 					cout << "ProcConsola: acabo de recibir como rta: " << recibir << endl;
 
-					cout << "ProcConsola: En la variable de consola hay: " << entradaConsola << endl;
 				} else {
 					salir = true;
 				}

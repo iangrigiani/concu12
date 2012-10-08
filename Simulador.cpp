@@ -86,6 +86,11 @@ void Simulador::simular(){
 					automovil->run();
 					//this->salirDelEstacionamiento(automovil);
 
+					stringstream mensaje;
+					mensaje << "h|";
+					mensaje << intToString(horas);
+					this->pipePpal.escribir((char*)mensaje.str().c_str(),BUFFSIZE);
+
 					delete(automovil);
 				}
 				pipeAuto.cerrar();
