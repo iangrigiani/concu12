@@ -4,9 +4,7 @@
 
 //MEMORIA COMPARTIDA
 const char* const ARCHIVO_POSICIONES = "/tmp/tmpPosiciones";
-const char* const ARCHIVO_POSICIONES_LIBRES = "/tmp/tmpPosicionesLibres";
 const char* const ARCHIVO_ADMINISTRACION = "/tmp/tmpAdministracion";
-
 
 //LOG
 const int PRECISION_SEGUNDOS = 6;

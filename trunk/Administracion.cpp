@@ -6,6 +6,8 @@
 Administracion::Administracion()
 {
 	this->importeRecaudado = 0;
+	this->cantidadDeAutos = 0;
+	this->costoHora = 0;
 }
 
 
