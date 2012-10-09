@@ -3,7 +3,6 @@
 
 
 Estacionamiento::Estacionamiento() {
-	this->montoTotal = 0;
 }
 
 
@@ -18,36 +17,23 @@ void Estacionamiento::crearArchivosTemporales(int cantidadLugares)
 
 	int i;
 	FILE * tmpPosicion;
-	FILE * tmpLibres;
 	FILE * tmpAdministracion;
 
 	for (i=0;i<cantidadLugares;i++)
 	{
 		stringstream nombreArchivo;
-		stringstream nombreArchivoLibres;
 
 		// Creo archivo temporal posiciones
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
 		//cout << "nombre archivo: " << nombreArchivo.str() << endl;
 
-
-		// Creo archivo temporal posiciones libres
-		nombreArchivoLibres << ARCHIVO_POSICIONES_LIBRES;
-		nombreArchivoLibres << i;
-		//cout << "nombre archivo libres: " << nombreArchivoLibres.str() << endl;
-
-
 		tmpPosicion = fopen(nombreArchivo.str().c_str(),"w");
 		fclose(tmpPosicion);
 
 
-		tmpLibres = fopen(nombreArchivoLibres.str().c_str(),"w");
-		fclose(tmpLibres);
-
 		nombreArchivo.flush();
 
-		nombreArchivoLibres.flush();
 	}
 
 	// Creo archivo temporal administracion
@@ -75,13 +61,6 @@ void Estacionamiento::eliminarArchivosTemporales(int cantidadLugares)
 		nombreArchivo << i;
 		//cout << "destruccion archivo: " << nombreArchivo.str() << endl;
 
-
-		// Destruyo archivo temporal posiciones libres
-		nombreArchivoLibres << ARCHIVO_POSICIONES_LIBRES;
-		nombreArchivoLibres << i;
-		//cout << "destruccion archivo libres: " << nombreArchivoLibres.str() << endl;
-
-
 		remove(nombreArchivo.str().c_str());
 
 		remove(nombreArchivoLibres.str().c_str());
@@ -89,7 +68,6 @@ void Estacionamiento::eliminarArchivosTemporales(int cantidadLugares)
 
 		nombreArchivo.flush();
 
-		nombreArchivoLibres.flush();
 	}
 
 	// Destruyo archivo temporal administracion
@@ -117,7 +95,6 @@ void Estacionamiento::crearMemoriaCompartidaPosiciones(int cantidadLugares)
 		// Creo archivo temporal
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
-		//cout << "nombre archivo creando memoria posiciones: " << nombreArchivo.str() << endl;
 
 		// Creo la memoria asociada al archivo temporal
 		estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
@@ -127,7 +104,6 @@ void Estacionamiento::crearMemoriaCompartidaPosiciones(int cantidadLugares)
 		Log::getInstance()->loguear(mensajeLog.str());
 
 		posicion.setNumero(i);
-		posicion.setEstadoOcupado(true);
 
 		memoria.escribir(posicion);
 
@@ -138,40 +114,22 @@ void Estacionamiento::crearMemoriaCompartidaPosiciones(int cantidadLugares)
 	}
 }
 
-void Estacionamiento::crearMemoriaCompartidaPosicionesLibres(int cantidadLugares)
+void Estacionamiento::crearVectorPosicionesLibres(int cantidadLugares)
 {
 
 	int i;
-	int estadoMemoria = SHM_OK;
-	Posicion posicion;
-	MemoriaCompartida<Posicion> memoria;
 
 	for (i=0;i<cantidadLugares;i++)
 	{
-		stringstream nombreArchivo;
+
 		stringstream mensajeLog;
 
-		// Creo archivo temporal
-		nombreArchivo << ARCHIVO_POSICIONES_LIBRES;
-		nombreArchivo << i;
-		//cout << "nombre archivo creando memoria posiciones: " << nombreArchivo.str() << endl;
-
-		// Creo la memoria asociada al archivo temporal
-		estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
-
-		mensajeLog << "Memoria Compartida : escribo el numero " << i <<" en el vector de posiciones libres.";
+		mensajeLog << "Escribo el numero " << i <<" en el vector de posiciones libres.";
 
 		Log::getInstance()->loguear(mensajeLog.str());
 
+		this->vectorMemoriaPosicionesLibres.push_back(i);
 
-		posicion.setNumero(i);
-		posicion.setEstadoOcupado(true);
-
-		memoria.escribir(posicion);
-
-		this->vectorMemoriaPosicionesLibres.push_back(memoria);
-
-		nombreArchivo.flush();
 		mensajeLog.flush();
 	}
 
@@ -187,6 +145,7 @@ void Estacionamiento::crearMemoriaCompartidaAdministracion(int costoHora)
 	int estadoMemoria = SHM_OK;
 
 	administracion.setCostoHora(costoHora);
+
 
 	// Creo archivo temporal
 	nombreArchivo << ARCHIVO_ADMINISTRACION;
@@ -212,9 +171,7 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 		// Pipe para la comunicacion de todas las entradas y la consola con el proceso principal. Todos escriben
 		// ahi y el proceso principal solo lee
 
-
 		// Pipe para responder las consultas de la consola
-
 
 		pid_t pConsola = fork();
 
@@ -233,13 +190,14 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 			mensajeLog << "Soy el proceso principal";
 
 			Log::getInstance()->loguear(mensajeLog.str());
-/*
+
 			this->crearArchivosTemporales(cantidadDeLugares);
 
 			this->crearMemoriaCompartidaPosiciones(cantidadDeLugares);
-			this->crearMemoriaCompartidaPosicionesLibres(cantidadDeLugares);
+
 			this->crearMemoriaCompartidaAdministracion(costoHora);
-*/
+
+			this->crearVectorPosicionesLibres(cantidadDeLugares);
 
 
 			//Proceso padre
@@ -254,7 +212,7 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 
 				Log::getInstance()->loguear(mensajeLog.str());
 
-				correrSimulador(1, tiempoEjecucion, this->pipeEntrada1);
+				correrSimulador(1, tiempoEjecucion, this->pipeEntrada1,cantidadDeLugares);
 			}
 			else
 			{
@@ -268,7 +226,7 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 					mensajeLog << "Soy el proceso entrada 2";
 					Log::getInstance()->loguear(mensajeLog.str());
 
-					correrSimulador(2, tiempoEjecucion, this->pipeEntrada2);
+					correrSimulador(2, tiempoEjecucion, this->pipeEntrada2,cantidadDeLugares);
 				}
 				else
 				{
@@ -282,7 +240,7 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 						mensajeLog << "Soy el proceso entrada 3";
 						Log::getInstance()->loguear(mensajeLog.str());
 
-						correrSimulador(3, tiempoEjecucion, this->pipeEntrada3);
+						correrSimulador(3, tiempoEjecucion, this->pipeEntrada3,cantidadDeLugares);
 					}
 					else {
 						// Proceso principal (funciona como servidor de mensajes)
@@ -306,13 +264,15 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 							{
 								case 'a': {
 									cout << "Ingreso una a" << endl;
-									retorno << "te devuelvo la cantidad de autos...";
+									int cantidad = this->obtenerCantidadActualDeAutos();
+									retorno << "La cantidad actual de autos es : "<< cantidad;
 									this->pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
 									break;
 								}
 								case 'm': {
 									cout << "Ingreso una m" << endl;
-									retorno << this->montoTotal;
+									float monto = this->obtenerMontoRecaudado();
+									retorno << "El monto recaudado hasta el momento es : "<<monto;
 									this->pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
 									break;
 								}
@@ -326,21 +286,14 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 									char * token = strtok(recibido, "|");
 									token = strtok(NULL, "|");
 									cout << "Saco del vector de posiciones libres la posicion: " << token << endl;
-									break;
-								}
-								case 'h': {
-									// Actualizo el monto total recaudado
-									char * token = strtok(recibido, "|");
-									token = strtok(NULL, "|");
-									int horas = atoi(token);
-									this->montoTotal += horas*costoHora;
-									cout << "Sumo al monto total: " << horas*costoHora << endl;
+									int pos = atoi(token);
+									this->quitarPosicionLibre(pos);
 									break;
 								}
 								default: {
 									if ( recibido[0] > '0' && recibido[0] < '4') {
 										int nroPosicion;
-										nroPosicion = calcularRandom(cantidadDeLugares);
+										nroPosicion = this->getPosicionAleatoria();
 										cout << "Entrada " << recibido[0] << " pide una posicion, le envio: " << nroPosicion << endl;
 										retorno << nroPosicion;
 										if (recibido[0] == '1'){
@@ -368,24 +321,12 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 						waitpid(pEntrada2, &estado, 0);
 						waitpid(pEntrada3, &estado, 0);
 
+						this->liberarMemoriaCompartida(cantidadDeLugares);
+
 						this->pipeEntrada1.cerrar();
 						this->pipeEntrada2.cerrar();
 						this->pipeEntrada3.cerrar();
-						int i;
-/*
-						for (i=0;i<cantidadDeLugares;i++)
-						{
-							MemoriaCompartida<Posicion> memoriaPosicion;
-							memoriaPosicion = this->vectorMemoriaPosiciones[i];
-							memoriaPosicion.liberar();
 
-							MemoriaCompartida<Posicion> memoriaLibres;
-							memoriaLibres = this->vectorMemoriaPosicionesLibres[i];
-							memoriaLibres.liberar();
-						}
-
-						this->eliminarArchivosTemporales(cantidadDeLugares);
-*/
 						pipePpal.cerrar();
 						cout << "Terminado proceso..." << pConsola << endl;
 						cout << "FIN SIMULACION" << endl;
@@ -439,11 +380,11 @@ void Estacionamiento::run(int cantidadDeLugares, int costoHora, int tiempoEjecuc
 
 
 
-void Estacionamiento::correrSimulador(int numeroEntrada, int tiempoEjecucion, Pipe pipeEntrada)
+void Estacionamiento::correrSimulador(int numeroEntrada, int tiempoEjecucion, Pipe pipeEntrada, int cantidadPosiciones)
 {
 	Simulador * simulador;
 
-	simulador = new Simulador(numeroEntrada);
+	simulador = new Simulador(numeroEntrada,cantidadPosiciones);
 
 	simulador->getCronometro()->setTiempoASimular(tiempoEjecucion);
 	simulador->setPipePrincipal(this->pipePpal);
@@ -455,24 +396,29 @@ void Estacionamiento::correrSimulador(int numeroEntrada, int tiempoEjecucion, Pi
 }
 
 
-
-Entrada * Estacionamiento::getEntradaAleatoria()
+int Estacionamiento::getPosicionAleatoria()
 {
-	/*int cantidadEntradas = this->entradas->size();
+	int cantidadPosiciones = this->vectorMemoriaPosicionesLibres.size();
+
+	//Si la lista de posiciones libres esta vacia, entonces debe retornar un numero
+	//negativo de manera que no deje entrar a ningun auto.
+	if(cantidadPosiciones == 0)
+		return -1;
+
 	int numeroElegido;
 	int indiceActual = 0;
-	Entrada * entradaElegida;
+	int posicionElegida = 0;
 
 	srand((unsigned)time(0));
-	numeroElegido = (rand()%cantidadEntradas);
+	numeroElegido = calcularRandom(cantidadPosiciones);
 
-	list<Entrada*>::iterator it = this->entradas->begin();
+	vector<int>::iterator it = this->vectorMemoriaPosicionesLibres.begin();
 
-	 while ( it != this->entradas->end())
+	 while ( it != this->vectorMemoriaPosicionesLibres.end())
 	 {
 		 if(indiceActual == numeroElegido)
 		 {
-			 entradaElegida = *it;
+			 posicionElegida = this->vectorMemoriaPosicionesLibres[indiceActual];
 			 break;
 		 }
 
@@ -480,38 +426,89 @@ Entrada * Estacionamiento::getEntradaAleatoria()
 		 indiceActual++;
 	 }
 
-	 return entradaElegida;*/
-	return NULL;
+	 return posicionElegida;
+
 }
 
-
-
-Salida * Estacionamiento::getSalidaAleatoria()
+void Estacionamiento::quitarPosicionLibre(int numeroPosicion)
 {
-	/*int cantidadSalidas = this->salidas->size();
-	int numeroElegido;
-	int indiceActual = 0;
-	Salida * salidaElegida;
+	int inicio = 0;
+	int fin = this->vectorMemoriaPosicionesLibres.size()-1;
 
-	srand((unsigned)time(0));
-	numeroElegido = (rand()%cantidadSalidas);
+	int posicionBuscado = busquedaBinariaVectorLibres(inicio,fin,numeroPosicion);
 
-	list<Salida*>::iterator it = this->salidas->begin();
+	//cout<<"La posicion buscada y a eliminar es "<<posicionBuscado<<endl;
 
-	 while ( it != this->salidas->end())
-	 {
-		 if(indiceActual == numeroElegido)
-		 {
-			 salidaElegida = *it;
-			 break;
-		 }
+	this->vectorMemoriaPosicionesLibres.erase (this->vectorMemoriaPosicionesLibres.begin()+posicionBuscado);
 
-		 ++it;
-		 indiceActual++;
-	 }
+	/*int tamanio = this->vectorMemoriaPosicionesLibres.size();
 
-	 return salidaElegida;*/
-	return NULL;
+	for(int i=0; i<tamanio;i++)
+	{
+		int pos = this->vectorMemoriaPosicionesLibres[i];
+		cout<<"El vector tiene la pos "<< pos <<endl;
+
+	}*/
+
 
 }
+
+
+int Estacionamiento::busquedaBinariaVectorLibres(int inicio,int fin,int buscado)
+{
+	if (inicio > fin)
+		return -1;
+	else {
+		  int pos = (inicio + fin) / 2;
+		  if (buscado < this->vectorMemoriaPosicionesLibres[pos])
+			 return(this->busquedaBinariaVectorLibres(inicio, pos - 1, buscado));
+		  else if (buscado > this->vectorMemoriaPosicionesLibres[pos])
+			 return(this->busquedaBinariaVectorLibres(pos + 1, fin, buscado));
+		  else
+			 return(pos);
+	   	   }
+}
+
+
+
+void Estacionamiento::agregarPosicionLibre(int numeroPosicion)
+{
+	this->vectorMemoriaPosicionesLibres.push_back(numeroPosicion);
+
+}
+
+
+int Estacionamiento::obtenerCantidadActualDeAutos()
+{
+	Administracion administracion = (Administracion)this->administracion.leer();
+	return administracion.getCantidadDeAutos();
+}
+
+float Estacionamiento::obtenerMontoRecaudado()
+{
+	Administracion administracion = (Administracion)this->administracion.leer();
+	return administracion.getImporteRecaudado();
+}
+
+
+void Estacionamiento::liberarMemoriaCompartida(int cantidadLugares)
+{
+	int i;
+
+	//Se libera la memoria compartida correspondiente a las posiciones en el estacionamiento.
+	for (i=0;i<cantidadLugares;i++)
+	{
+		MemoriaCompartida<Posicion> memoriaPosicion;
+		memoriaPosicion = this->vectorMemoriaPosiciones[i];
+		memoriaPosicion.liberar();
+	}
+
+	//Se libera la memoria compartida correspondiente a la administracion.
+	this->administracion.liberar();
+
+	//Se eliminan los archivos temporales creados
+	this->eliminarArchivosTemporales(cantidadLugares);
+
+}
+
 

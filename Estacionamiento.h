@@ -25,7 +25,7 @@ class Estacionamiento {
 private:
 
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
-	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosicionesLibres;
+	vector<int> vectorMemoriaPosicionesLibres;
 	MemoriaCompartida<Administracion> administracion;
 
 	Pipe pipeConsola;
@@ -33,16 +33,34 @@ private:
 	Pipe pipeEntrada1;
 	Pipe pipeEntrada2;
 	Pipe pipeEntrada3;
-
-	int montoTotal;
-
+	Pipe pipeSalida1;
+	Pipe pipeSalida2;
 
 	void crearArchivosTemporales(int cantidadLugares);
+
 	void eliminarArchivosTemporales(int cantidadLugares);
+
 	void crearMemoriaCompartidaPosiciones(int cantidadLugares);
-	void crearMemoriaCompartidaPosicionesLibres(int cantidadLugares);
+
+	void crearVectorPosicionesLibres(int cantidadLugares);
+
 	void crearMemoriaCompartidaAdministracion(int costoHora);
-	void correrSimulador(int numeroEntrada, int tiempoEjecucion, Pipe pipeEntrada);
+
+	void correrSimulador(int numeroEntrada, int tiempoEjecucion, Pipe pipeEntrada,int cantidadPosiciones);
+
+	int getPosicionAleatoria();
+
+	void quitarPosicionLibre(int numeroPosicion);
+
+	void agregarPosicionLibre(int numeroPosicion);
+
+	int busquedaBinariaVectorLibres(int inicio,int fin,int buscado);
+
+	void liberarMemoriaCompartida(int cantidadLugares);
+
+	int obtenerCantidadActualDeAutos();
+
+	float obtenerMontoRecaudado();
 
 
 
@@ -53,10 +71,6 @@ public:
 	virtual ~Estacionamiento();
 
 	void run(int cantidadDeLugares, int costoHora, int tiempoEjecucion);
-
-	Entrada * getEntradaAleatoria();
-
-	Salida * getSalidaAleatoria();
 
 
 };

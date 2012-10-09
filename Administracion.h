@@ -26,9 +26,9 @@ class Administracion
 
 	public:
 			Administracion();
+
 			~Administracion(){};
 
-			static Administracion* obtenerAdministracion();
 
 			float getCostoHora();
 

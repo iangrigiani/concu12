@@ -2,11 +2,15 @@
 #include "Simulador.h"
 
 
-Simulador::Simulador(int numeroEntrada)
+Simulador::Simulador(int numeroEntrada,int cantidadPosiciones)
 {
 	this->entrada = new Entrada(numeroEntrada);
 	this->cronometro =  Cronometro::obtenerCronometro();
 	this->cantidadAutos = 0;
+
+	//Asocian a la misma memoria compartida que crea el principal
+	inicializarMemoriaCompartidaVectorPosiciones(cantidadPosiciones);
+	inicializarMemoriaCompartidaAdministracion();
 
 }
 
@@ -15,6 +19,54 @@ Simulador::~Simulador(){
 
 	delete this->cronometro;
 
+}
+
+void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosiciones)
+{
+	int i;
+	int estadoMemoria = SHM_OK;
+	Posicion posicion;
+	MemoriaCompartida<Posicion> memoria;
+
+	for (i=0;i<cantidadPosiciones;i++)
+	{
+		stringstream nombreArchivo;
+		stringstream mensajeLog;
+
+		// Creo archivo temporal
+		nombreArchivo << ARCHIVO_POSICIONES;
+		nombreArchivo << i;
+
+		// Creo la memoria asociada al archivo temporal
+		estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
+
+		posicion = memoria.leer();
+		//cout<<"Estoy en simulador y soy la entrada"<<this->entrada->getNumeroDeEntrada() <<" con posicion "<<posicion.getNumero()<<" el estado ocupado es "<<posicion.getEstadoOcupado()<<endl;
+
+
+		this->vectorMemoriaPosiciones.push_back(memoria);
+
+		nombreArchivo.flush();
+
+	}
+
+}
+
+void Simulador::inicializarMemoriaCompartidaAdministracion()
+{
+	Administracion administracion;
+	stringstream nombreArchivo;
+	int estadoMemoria = SHM_OK;
+
+	// Creo archivo temporal
+	nombreArchivo << ARCHIVO_ADMINISTRACION;
+
+	// Hago el atach a  la memoria asociada al archivo temporal
+	estadoMemoria = this->administracion.crear ( (char*)nombreArchivo.str().c_str(),'R' );
+
+	administracion = (Administracion)this->administracion.leer();
+
+	//cout<<"Estoy en la entrada "<<this->entrada->getNumeroDeEntrada()<<" y leo que el costo hora es "<< administracion.getCostoHora()<<endl;
 }
 
 
@@ -75,21 +127,22 @@ void Simulador::simular(){
 				// Si el numero de posicion es > 0 entonces hay lugar y el auto puede entrar
 				if (numeroPosicion > 0) {
 
+					cout<<"Numero Posicion asignada al auto que entra  "<<numeroPosicion<<" en la entrada "<<this->entrada->getNumeroDeEntrada()<<endl;
+
 					double horasAleatoriasEstadia = this->getNumeroAleatorio();
 					int horas = ceil(50*horasAleatoriasEstadia);
 					Auto * automovil = new Auto(horas);
 					automovil->setNumeroPosicion(numeroPosicion);
-					//this->entrarAlEstacionamiento(automovil);
+
 
 					cout << "Entrada " << this->entrada->getNumeroDeEntrada() << " Soy el auto pid: " << getpid() << " y entro en la posicion: " << numeroPosicion << endl;
-					//el while del auto
+					//El auto duerme el tiempo que permanece en el estacionamiento
 					automovil->run();
-					//this->salirDelEstacionamiento(automovil);
 
-					stringstream mensaje;
-					mensaje << "h|";
-					mensaje << intToString(horas);
-					this->pipePpal.escribir((char*)mensaje.str().c_str(),BUFFSIZE);
+					this->incrementarMontoRecaudado(horas);
+
+					//TODO hay que agregar el pipe al principal para que le avise que tiene que sacar el auto
+					//y la salida sacarlo
 
 					delete(automovil);
 				}
@@ -109,7 +162,8 @@ void Simulador::simular(){
 				stringstream nroEntrada;
 				nroEntrada << this->entrada->getNumeroDeEntrada();
 
-				while (!cicloCompleto) {
+				while (!cicloCompleto)
+				{
 
 					//Agregar semaforo para sincronizar el acceso
 					//Pido una ubicacion libre al servidor
@@ -123,42 +177,37 @@ void Simulador::simular(){
 
 					int numeroPosicion = atoi(recibir);
 					//Si devuelve un nro negativo, entonces no hay lugar y el auto no puede ingresar
-					if (numeroPosicion < 0) {
+					if (numeroPosicion < 0)
+					{
 						pipeAuto.escribir(recibir,BUFFSIZE);
 						cicloCompleto = true;
-					} else {
+					}
+					else {
+
+						//TODO semaforo
 						//Aca intento tomar escribir en esa posicion de memoria para ocuparla, si no puedo, busco otra
-						bool pudeOcuparPosicion = true;
-						if (pudeOcuparPosicion) {
+						bool pudeOcuparPosicion = this->modificarPosicionCompartida(numeroPosicion);
+
+						if (pudeOcuparPosicion)
+						{
+							stringstream param;
 							pipeAuto.escribir(recibir,BUFFSIZE);
+
+							this->incrementarCantidadDeAutos();
 
 							//Tengo que avisarle al proceso principal que saque del vector de posiciones libres
 							//la posicion que me asigno recien (le paso el nro por el pipe: s|nroPosicion )
 							//la 's' es para avisarle que saque (convencion)
-							this->cantidadAutos++;
+
+							param<<"s|";
+							param<<numeroPosicion;
+
+							this->pipePpal.escribir((char*)param.str().c_str(),BUFFSIZE);
 							cicloCompleto = true;
 						}
 
 					}
 
-
-
-					/*
-					MemoriaCompartida<Posicion> memoriaLibre = this->vectorMemoriaPosicionesLibres[numero];
-
-
-					Posicion posicionLibre =(Posicion)memoriaLibre.leer();
-
-					MemoriaCompartida<Posicion> memoriaPosicion = this->vectorMemoriaPosiciones[posicionLibre.getNumero()];
-					Posicion posicion = (Posicion)memoriaPosicion.leer();
-
-					//Si esta ocupado tiene que buscar otro libre sino cambiarle el estado
-					if(!posicion.getEstadoOcupado())
-					{
-						posicion.setEstadoOcupado(true);
-						memoriaPosicion.escribir(posicion);
-					}
-					*/
 				}
 
 				pipeAuto.cerrar();
@@ -187,22 +236,64 @@ void Simulador::simular(){
 
 }
 
-bool Simulador::entrarAlEstacionamiento(Auto * automovil)
+
+
+bool Simulador::modificarPosicionCompartida(int numeroPosicion)
 {
-	/*if(Estacionamiento::obtenerEstacionamiento()->getEntradaAleatoria()->registrarEntradaAuto(automovil))
-		automovil->setHaEntrado(true);
-	 */
-	return automovil->getHaEntrado();
+
+	int estadoMemoria = SHM_OK;
+	//TODO Semaforos!!!
+	bool pudoOcuparPosicion = true;
+	MemoriaCompartida<Posicion> memoria;
+	Posicion posicion;
+
+	stringstream mensajeLog;
+
+	mensajeLog << "Memoria Compartida : soy la entrada "<< this->entrada->getNumeroDeEntrada()<<" y modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
+
+	Log::getInstance()->loguear(mensajeLog.str());
+
+	memoria = this->vectorMemoriaPosiciones[numeroPosicion];
+
+	posicion.setNumero(numeroPosicion);
+	posicion.setEstadoOcupado(true);
+	memoria.escribir(posicion);
+	this->vectorMemoriaPosiciones[numeroPosicion] = memoria;
+
+	return pudoOcuparPosicion;
+
+}
+
+void Simulador::incrementarCantidadDeAutos()
+{
+	Administracion admin = (Administracion)this->administracion.leer();
+
+	//cout<<"Entrada : "<<this->entrada->getNumeroDeEntrada()<<" Hay "<<admin.getCantidadDeAutos()<<" en el estacionamiento"<<endl;
+
+	admin.incrementarCantidadAutos();
+
+	this->administracion.escribir(admin);
+
+	stringstream mensajeLog;
+
+	mensajeLog <<"Se registra la entrada de un auto al estacionamiento habiendo en total: "<<admin.getCantidadDeAutos();
+
+	Log::getInstance()->loguear(mensajeLog.str());
+
+
+	//ESTO ERA PARA SABER SI ESCRIBIA BIEN Y SI AL LEER SE OBTIENE EL DATO MODIFICADO
+	//Administracion administracion2 = (Administracion)this->administracion.leer();
+	//cout<<"Entrada : "<<this->entrada->getNumeroDeEntrada()<<"Y como ingresa un auto ahora hay "<<administracion2.getCantidadDeAutos()<<endl;
+
+
 }
 
 
-bool Simulador::salirDelEstacionamiento(Auto * automovil)
+void Simulador::incrementarMontoRecaudado(int horas)
 {
-	/*if(Estacionamiento::obtenerEstacionamiento()->getSalidaAleatoria()->registrarSalidaAuto(automovil))
-		automovil->setHaEntrado(false);
-	*/
-	return automovil->getHaEntrado();
+	Administracion admin = (Administracion)this->administracion.leer();
+	admin.actualizarImporteRecaudado(horas);
+	this->administracion.escribir(admin);
 
 }
-
 
