@@ -39,7 +39,7 @@ void Administracion::incrementarCantidadAutos()
 
 void Administracion::decrementarCantidadAutos()
 {
-	this->cantidadDeAutos++;
+	this->cantidadDeAutos--;
 }
 
 

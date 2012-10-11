@@ -1,6 +1,7 @@
-
 #ifndef SIMULADOR_H_
 #define SIMULADOR_H_
+
+
 
 
 #include <unistd.h>
@@ -10,50 +11,40 @@
 #include <sstream>
 #include "Cronometro.h"
 #include "MemoriaCompartida.h"
-#include "Entrada.h"
+#include "Administracion.h"
 #include "Auto.h"
 #include "Pipe.h"
 #include "Constantes.h"
 #include "Utils.h"
 #include "Log.h"
 
-class Simulador
-{
 
-private:
 
-	Entrada * entrada;
+class Simulador {
+
+protected:
+
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
 	MemoriaCompartida<Administracion> administracion;
-	Cronometro * cronometro;
-	int cantidadAutos;
-	Pipe pipePpal;
-	Pipe pipeEntrada;
 
-	double getNumeroAleatorio();
-	bool modificarPosicionCompartida(int numeroPosicion);
+	Pipe pipePpal;
+	int numero;
+
 	void inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosiciones);
 	void inicializarMemoriaCompartidaAdministracion();
-	void incrementarCantidadDeAutos();
-	void incrementarMontoRecaudado(int horas);
 
+	void decrementarCantidadAutosEstacionamiento();
 
+	int getCantidadAutosEstacionamiento();
 
 
 public:
 
-	Simulador(int numeroEntrada,int cantidadPosiciones);
-	~Simulador();
-	void simular();
+	Simulador(int numero,int cantidadPosiciones);
+	virtual ~Simulador();
 
 	void setPipePrincipal(Pipe pipePrincipal);
 	Pipe getPipePrincipal();
-	void setPipeEntrada(Pipe pipeEntrada);
-	Pipe getPipeEntrada();
-
-	Cronometro * getCronometro();
-
-
 };
 
 #endif /* SIMULADOR_H_ */

@@ -70,6 +70,14 @@ bool Cronometro::llegoAlFinal() {
 	return retorno;
 }
 
+void Cronometro::destruir ()
+{
+	if ( cronometro != NULL ) {
+		delete ( cronometro );
+		cronometro = NULL;
+	}
+}
+
 
 
 
