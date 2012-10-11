@@ -27,7 +27,7 @@ Log* Log::getInstance()
 void Log::destruir ()
 {
 	if ( instance != NULL ) {
-		Log::getInstance()->loguear("Log: destruido.");
+		//Log::getInstance()->loguear("Log: destruido.");
 		delete ( instance );
 		instance = NULL;
 	}

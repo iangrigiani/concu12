@@ -11,6 +11,8 @@ const int PRECISION_SEGUNDOS = 6;
 const char* const PATH_LOG = "Log";
 const char* const EXTENSION_LOG = ".txt";
 
+//ENTRADAS
+const int CANTIDAD_TOTAL_ENTRADAS = 6;
 
 const int BUFFSIZE = 100;
 

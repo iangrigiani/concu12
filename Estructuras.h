@@ -5,7 +5,7 @@
 
 struct Parametros {
         int lugaresDisponibles;
-        int costoHora;
+        float costoHora;
         int tiempoSimulacion;
 };
 

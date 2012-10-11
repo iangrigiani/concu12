@@ -30,6 +30,8 @@ public:
 
 	void setTiempoASimular(int tiempo);
 
+	static void destruir ();
+
 };
 
 #endif /* CRONOMETRO_H_ */

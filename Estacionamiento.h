@@ -10,9 +10,9 @@
 #include <sys/wait.h>
 #include <sstream>
 #include "Administracion.h"
-#include "Entrada.h"
-#include "Salida.h"
-#include "Simulador.h"
+#include "Cronometro.h"
+#include "SimuladorEntrada.h"
+#include "SimuladorSalida.h"
 #include "Utils.h"
 #include "Constantes.h"
 #include "Log.h"
@@ -44,11 +44,15 @@ private:
 
 	void crearVectorPosicionesLibres(int cantidadLugares);
 
-	void crearMemoriaCompartidaAdministracion(int costoHora);
+	void crearMemoriaCompartidaAdministracion(float costoHora);
 
-	void correrSimulador(int numeroEntrada, int tiempoEjecucion, Pipe pipeEntrada,int cantidadPosiciones);
+	void correrSimuladorEntrada(int numeroEntrada,Pipe pipeEntrada,int cantidadPosiciones);
+
+	void correrSimuladorSalida(int numeroSalida, Pipe pipeSalida, int cantidadPosiciones);
 
 	int getPosicionAleatoria();
+
+	int getSalidaAleatoria();
 
 	void quitarPosicionLibre(int numeroPosicion);
 
@@ -70,7 +74,7 @@ public:
 
 	virtual ~Estacionamiento();
 
-	void run(int cantidadDeLugares, int costoHora, int tiempoEjecucion);
+	void run(int cantidadDeLugares, float costoHora, int tiempoEjecucion);
 
 
 };
