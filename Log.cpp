@@ -51,11 +51,10 @@ void Log::loguear(string mensaje)
 			s.precision( PRECISION_SEGUNDOS );
 			s << "Proceso: "<< getpid() << " " << segundos << "s: " << mensaje << endl;
 
-			const char * cadena = s.str().c_str();
 
-			if (logFile.escribir(cadena, strlen(cadena)) == -1) {
+			if (logFile.escribir(s.str().c_str(), strlen(s.str().c_str())) == -1) {
 				cerr << "Ha ocurrido un error al escibir el mensaje" << endl;
-				cerr << "\"" << cadena << "\"" << endl;
+				cerr << "\"" << s << "\"" << endl;
 			}
 
 			logFile.liberarLock();

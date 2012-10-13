@@ -187,268 +187,270 @@ void Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
 
 void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjecucion)
 {
-		// Pipe para la comunicacion de todas las entradas y la consola con el proceso principal. Todos escriben
-		// ahi y el proceso principal solo lee
 
-		// Pipe para responder las consultas de la consola
+	// Genero un vector dinamico y lo inicializo para evitar los warning de compilador y de valgrind
+	char recibido[BUFFSIZE];
+	int q;
+
+	for (q=0; q<BUFFSIZE; q++) {
+		recibido[q] = 0;
+	}
 
 
-		//Inicializa el tiempo en el cronometro y arranca el tiempo a correr en la simulacion
-		Cronometro::obtenerCronometro()->setTiempoASimular(tiempoEjecucion);
-		Cronometro::obtenerCronometro()->iniciarTiempo();
+	//Inicializa el tiempo en el cronometro y arranca el tiempo a correr en la simulacion
+	Cronometro::obtenerCronometro()->setTiempoASimular(tiempoEjecucion);
+	Cronometro::obtenerCronometro()->iniciarTiempo();
 
-		pid_t pConsola = fork();
+	pid_t pConsola = fork();
 
-		pid_t pEntrada1;
-		pid_t pEntrada2;
-		pid_t pEntrada3;
+	pid_t pEntrada1;
+	pid_t pEntrada2;
+	pid_t pEntrada3;
 
-		pid_t pSalida1;
-		pid_t pSalida2;
+	pid_t pSalida1;
+	pid_t pSalida2;
 
-		if( pConsola != 0)
+	if( pConsola != 0)
+	{
+
+		stringstream mensajeLog;
+
+		mensajeLog << "Soy el proceso principal";
+
+		Log::getInstance()->loguear(mensajeLog.str());
+
+		this->crearArchivosTemporales(cantidadDeLugares);
+
+		this->crearMemoriaCompartidaPosiciones(cantidadDeLugares);
+
+		this->crearMemoriaCompartidaAdministracion(costoHora);
+
+		this->crearVectorPosicionesLibres(cantidadDeLugares);
+
+
+		//Proceso padre
+		pEntrada1 = fork();
+
+		if( pEntrada1 == 0)
 		{
-
+			//Proceso entrada 1
 			stringstream mensajeLog;
 
-			mensajeLog << "Soy el proceso principal";
+			mensajeLog << "Soy el proceso entrada 1";
 
 			Log::getInstance()->loguear(mensajeLog.str());
 
-			this->crearArchivosTemporales(cantidadDeLugares);
+			correrSimuladorEntrada(1,this->pipeEntrada1,cantidadDeLugares);
+		}
+		else
+		{
 
-			this->crearMemoriaCompartidaPosiciones(cantidadDeLugares);
+			pEntrada2 = fork();
 
-			this->crearMemoriaCompartidaAdministracion(costoHora);
-
-			this->crearVectorPosicionesLibres(cantidadDeLugares);
-
-
-			//Proceso padre
-			pEntrada1 = fork();
-
-			if( pEntrada1 == 0)
+			if( pEntrada2 == 0)
 			{
-				//Proceso entrada 1
+				//Proceso entrada 2
 				stringstream mensajeLog;
-
-				mensajeLog << "Soy el proceso entrada 1";
-
+				mensajeLog << "Soy el proceso entrada 2";
 				Log::getInstance()->loguear(mensajeLog.str());
 
-				correrSimuladorEntrada(1,this->pipeEntrada1,cantidadDeLugares);
+				correrSimuladorEntrada(2,this->pipeEntrada2,cantidadDeLugares);
 			}
 			else
 			{
 
-				pEntrada2 = fork();
+				pEntrada3 = fork();
 
-				if( pEntrada2 == 0)
+				if( pEntrada3 == 0)
 				{
-					//Proceso entrada 2
+					//Proceso entrada 3
 					stringstream mensajeLog;
-					mensajeLog << "Soy el proceso entrada 2";
+					mensajeLog << "Soy el proceso entrada 3";
 					Log::getInstance()->loguear(mensajeLog.str());
 
-					correrSimuladorEntrada(2,this->pipeEntrada2,cantidadDeLugares);
+					correrSimuladorEntrada(3,this->pipeEntrada3,cantidadDeLugares);
 				}
 				else
 				{
+					pSalida1 = fork();
 
-					pEntrada3 = fork();
-
-					if( pEntrada3 == 0)
+					if (pSalida1 == 0)
 					{
-						//Proceso entrada 3
+						//Proceso salida 1
 						stringstream mensajeLog;
-						mensajeLog << "Soy el proceso entrada 3";
+						cout<<"Proceso salida 1 creado con pid "<<getpid()<<endl;
+						mensajeLog<<"Soy el proceso salida 1";
 						Log::getInstance()->loguear(mensajeLog.str());
 
-						correrSimuladorEntrada(3,this->pipeEntrada3,cantidadDeLugares);
+						correrSimuladorSalida(1,this->pipeSalida1,cantidadDeLugares);
 					}
 					else
 					{
-						pSalida1 = fork();
+						pSalida2 = fork();
 
-						if (pSalida1 == 0)
+						if(pSalida2 == 0)
 						{
-							//Proceso salida 1
+							//Proceso salida 2
+							cout<<"Proceso salida 2 creado con pid "<<getpid()<<endl;
 							stringstream mensajeLog;
-							cout<<"Proceso salida 1 creado con pid "<<getpid()<<endl;
-							mensajeLog<<"Soy el proceso salida 1";
+							mensajeLog<<"Soy el proceso salida 2";
 							Log::getInstance()->loguear(mensajeLog.str());
 
-							correrSimuladorSalida(1,this->pipeSalida1,cantidadDeLugares);
+							correrSimuladorSalida(2,this->pipeSalida2,cantidadDeLugares);
+
 						}
 						else
 						{
-							pSalida2 = fork();
+							// Proceso principal (funciona como servidor de mensajes)
 
-							if(pSalida2 == 0)
+							stringstream mensajeLog;
+							mensajeLog << "Soy el proceso principal funcionando como servidor de mensajes.";
+							Log::getInstance()->loguear(mensajeLog.str());
+
+							bool salir = false;
+
+							int cantidadTotalEntradas = 0;
+
+							while (!salir)
 							{
-								//Proceso salida 2
-								cout<<"Proceso salida 2 creado con pid "<<getpid()<<endl;
-								stringstream mensajeLog;
-								mensajeLog<<"Soy el proceso salida 2";
-								Log::getInstance()->loguear(mensajeLog.str());
+								int bytes = this->pipePpal.leer(recibido, BUFFSIZE);
 
-								correrSimuladorSalida(2,this->pipeSalida2,cantidadDeLugares);
+								cout << "ProcPrincipal: acabo de recibir: " << recibido << endl;
 
-							}
-							else
-							{
-								// Proceso principal (funciona como servidor de mensajes)
 
-								stringstream mensajeLog;
-								mensajeLog << "Soy el proceso principal funcionando como servidor de mensajes.";
-								Log::getInstance()->loguear(mensajeLog.str());
+								stringstream retorno;
 
-								bool salir = false;
-								char recibido[BUFFSIZE];
-
-								int cantidadTotalEntradas = 0;
-
-								while (!salir)
+								switch (recibido[0])
 								{
-									int bytes = this->pipePpal.leer(recibido, BUFFSIZE);
-									recibido[bytes] = '\0';
-
-									cout << "ProcPrincipal: acabo de recibir: " << recibido << endl;
-
-
-									stringstream retorno;
-
-									switch (recibido[0])
-									{
-										case 'a': {
-											cout << "Ingreso una a" << endl;
-											int cantidad = this->obtenerCantidadActualDeAutos();
-											retorno << "La cantidad actual de autos es : "<< cantidad;
-											this->pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-											break;
+									case 'a': {
+										cout << "Ingreso una a" << endl;
+										int cantidad = this->obtenerCantidadActualDeAutos();
+										retorno << "La cantidad actual de autos es : "<< cantidad;
+										this->pipeConsola.escribir((char*)retorno.str().c_str(),retorno.str().length());
+										break;
+									}
+									case 'm': {
+										cout << "Ingreso una m" << endl;
+										float monto = this->obtenerMontoRecaudado();
+										retorno << "El monto recaudado hasta el momento es : "<<monto;
+										this->pipeConsola.escribir((char*)retorno.str().c_str(),retorno.str().length());
+										break;
+									}
+									case 'q': {
+										cout << "Ingreso un q" << endl;
+										salir = true;
+										this->pipeConsola.cerrar();
+										break;
+									}
+									case 'p': {
+										char * token = strtok(recibido, "|");
+										token = strtok(NULL, "|");
+										cout << "Saco del vector de posiciones libres la posicion: " << token << endl;
+										int pos = atoi(token);
+										this->quitarPosicionLibre(pos);
+										break;
+									}
+									case 'd': {
+										char * token = strtok(recibido, "|");
+										token = strtok(NULL, "|");
+										cout << "Agrego al  vector de posiciones libres la posicion: " << token << endl;
+										int pos = atoi(token);
+										this->agregarPosicionLibre(pos);
+										break;
+									}
+									case 's': {
+										char * token = strtok(recibido, "|");
+										token = strtok(NULL, "|");
+										int pos = atoi(token);
+										int numeroSalida = this->getSalidaAleatoria();
+										cout << "Auto sale del estacionamiento por la salida "<<numeroSalida<<" y deja la posicion " << pos << endl;
+										retorno<<"s|";
+										retorno<<pos;
+										if(numeroSalida == 1){
+											this->pipeSalida1.escribir((char*)retorno.str().c_str(),retorno.str().length());
 										}
-										case 'm': {
-											cout << "Ingreso una m" << endl;
-											float monto = this->obtenerMontoRecaudado();
-											retorno << "El monto recaudado hasta el momento es : "<<monto;
-											this->pipeConsola.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-											break;
+										else
+										{
+											this->pipeSalida2.escribir((char*)retorno.str().c_str(),retorno.str().length());
+
 										}
-										case 'q': {
-											cout << "Ingreso un q" << endl;
-											salir = true;
-											this->pipeConsola.cerrar();
-											break;
-										}
-										case 'p': {
+										break;
+									}
+									case 'f': {
 											char * token = strtok(recibido, "|");
 											token = strtok(NULL, "|");
-											cout << "Saco del vector de posiciones libres la posicion: " << token << endl;
-											int pos = atoi(token);
-											this->quitarPosicionLibre(pos);
-											break;
-										}
-										case 'd': {
-											char * token = strtok(recibido, "|");
-											token = strtok(NULL, "|");
-											cout << "Agrego al  vector de posiciones libres la posicion: " << token << endl;
-											int pos = atoi(token);
-											this->agregarPosicionLibre(pos);
-											break;
-										}
-										case 's': {
-											char * token = strtok(recibido, "|");
-											token = strtok(NULL, "|");
-											int pos = atoi(token);
-											int numeroSalida = this->getSalidaAleatoria();
-											cout << "Auto sale del estacionamiento por la salida "<<numeroSalida<<" y deja la posicion " << pos << endl;
-											retorno<<"s|";
-											retorno<<pos;
-											if(numeroSalida == 1){
-												this->pipeSalida1.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-											}
-											else
+											int numeroEntrada = atoi(token);
+
+											cantidadTotalEntradas+=numeroEntrada;
+
+											cout<<"La cantidad total es "<<cantidadTotalEntradas<<endl;
+
+											if(cantidadTotalEntradas == CANTIDAD_TOTAL_ENTRADAS)
 											{
-												this->pipeSalida2.escribir((char*)retorno.str().c_str(),BUFFSIZE);
+												retorno<<"f|";
+												retorno<<"NO ESPERES MAS";
+												this->pipeSalida1.escribir((char*)retorno.str().c_str(),retorno.str().length());
+												this->pipeSalida2.escribir((char*)retorno.str().c_str(),retorno.str().length());
 
 											}
 											break;
-										}
-										case 'f': {
-												char * token = strtok(recibido, "|");
-												token = strtok(NULL, "|");
-												int numeroEntrada = atoi(token);
-
-												cantidadTotalEntradas+=numeroEntrada;
-
-												cout<<"La cantidad total es "<<cantidadTotalEntradas<<endl;
-
-												if(cantidadTotalEntradas == CANTIDAD_TOTAL_ENTRADAS)
-												{
-													retorno<<"f|";
-													retorno<<"NO ESPERES MAS";
-													this->pipeSalida1.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-													this->pipeSalida2.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-
-												}
-												break;
-										}
-										default: {
-											if ( recibido[0] > '0' && recibido[0] < '4') {
-												int nroPosicion;
-												nroPosicion = this->getPosicionAleatoria();
-												cout << "Entrada " << recibido[0] << " pide una posicion, le envio: " << nroPosicion << endl;
-												retorno << nroPosicion;
-												if (recibido[0] == '1'){
-													this->pipeEntrada1.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-												} else {
-													if (recibido[0] == '2') {
-														this->pipeEntrada2.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-													} else {
-														this->pipeEntrada3.escribir((char*)retorno.str().c_str(),BUFFSIZE);
-													}
-												}
+									}
+									default: {
+										if ( recibido[0] > '0' && recibido[0] < '4') {
+											int nroPosicion;
+											nroPosicion = this->getPosicionAleatoria();
+											cout << "Entrada " << recibido[0] << " pide una posicion, le envio: " << nroPosicion << endl;
+											retorno << nroPosicion;
+											if (recibido[0] == '1'){
+												this->pipeEntrada1.escribir((char*)retorno.str().c_str(),retorno.str().length());
 											} else {
-												cout << "Comando invalido" << endl;
+												if (recibido[0] == '2') {
+													this->pipeEntrada2.escribir((char*)retorno.str().c_str(),retorno.str().length());
+												} else {
+													this->pipeEntrada3.escribir((char*)retorno.str().c_str(),retorno.str().length());
+												}
 											}
-											break;
+										} else {
+											cout << "Comando invalido" << endl;
 										}
+										break;
 									}
 								}
-
-
-								int estado;
-								cout << endl << "Acordate de ingresar Q por teclado pq sino esto no muere mas!! " << endl;
-								cout << "Pconsola es...: " << pConsola << endl;
-								waitpid(pConsola, &estado, 0);
-								waitpid(pEntrada1, &estado, 0);
-								waitpid(pEntrada2, &estado, 0);
-								waitpid(pEntrada3, &estado, 0);
-								waitpid(pSalida1, &estado,0);
-								waitpid(pSalida2, &estado,0);
-
-								this->liberarMemoriaCompartida(cantidadDeLugares);
-
-								this->pipeEntrada1.cerrar();
-								this->pipeEntrada2.cerrar();
-								this->pipeEntrada3.cerrar();
-
-								this->pipeSalida1.cerrar();
-								this->pipeSalida2.cerrar();
-
-								pipePpal.cerrar();
-								cout << "Terminado proceso..." << pConsola << endl;
-								cout << "FIN SIMULACION" << endl;
-
-								stringstream mensajeFinalizacion;
-								mensajeFinalizacion<<"FIN SIMULACION";
-								Log::getInstance()->loguear(mensajeFinalizacion.str());
 							}
+
+
+							int estado;
+							cout << endl << "Acordate de ingresar Q por teclado pq sino esto no muere mas!! " << endl;
+							cout << "Pconsola es...: " << pConsola << endl;
+							waitpid(pConsola, &estado, 0);
+							waitpid(pEntrada1, &estado, 0);
+							waitpid(pEntrada2, &estado, 0);
+							waitpid(pEntrada3, &estado, 0);
+							waitpid(pSalida1, &estado,0);
+							waitpid(pSalida2, &estado,0);
+
+							this->liberarMemoriaCompartida(cantidadDeLugares);
+
+							this->pipeEntrada1.cerrar();
+							this->pipeEntrada2.cerrar();
+							this->pipeEntrada3.cerrar();
+
+							this->pipeSalida1.cerrar();
+							this->pipeSalida2.cerrar();
+
+							pipePpal.cerrar();
+							cout << "Terminado proceso..." << pConsola << endl;
+							cout << "FIN SIMULACION" << endl;
+
+							stringstream mensajeFinalizacion;
+							mensajeFinalizacion<<"FIN SIMULACION";
+							Log::getInstance()->loguear(mensajeFinalizacion.str());
 						}
 					}
 				}
 			}
 		}
+	}
 	else
 	{
 		// Proceso consola
@@ -457,20 +459,17 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 		mensajeLog << "Soy el proceso consola esperando el ingreso por pantalla.";
 		Log::getInstance()->loguear(mensajeLog.str());
 
-		char entradaConsola[BUFFSIZE];
-
 		bool salir = false;
 		// Para terminar el programa, el usuario debe escribir 'Q' o 'q'
 		while (!salir) {
-			entradaConsola[0] = '\0';
 			cout << "ProcConsola: Me quedo esperando que ingreses algo por consola..." << endl;
-			cin.getline(entradaConsola, BUFFSIZE);
+			cin.getline(recibido, BUFFSIZE);
 
 			// Aca hay que agregar la validacion para que solo pueda ingresar una letra para hacer consultas
 			// o para salir
-			this->pipePpal.escribir(entradaConsola,BUFFSIZE);
+			this->pipePpal.escribir(recibido,BUFFSIZE);
 
-			if (entradaConsola[0] != 'q' && entradaConsola[0] != 'Q') {
+			if (recibido[0] != 'q' && recibido[0] != 'Q') {
 
 				char recibir[BUFFSIZE];
 				int bytes = this->pipeConsola.leer(recibir, BUFFSIZE);
@@ -486,7 +485,6 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 		this->pipeConsola.cerrar();
 		this->pipePpal.cerrar();
 		cout << "Me rajo antes que muera... soy: " << getpid() << endl;
-		return;
 	}
 
 	Cronometro::destruir();
@@ -497,13 +495,9 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 
 void Estacionamiento::correrSimuladorEntrada(int numeroEntrada,Pipe pipeEntrada, int cantidadPosiciones)
 {
-	SimuladorEntrada * simuladorEntrada;
+	SimuladorEntrada * simuladorEntrada = new SimuladorEntrada(numeroEntrada,cantidadPosiciones);
 
-	simuladorEntrada = new SimuladorEntrada(numeroEntrada,cantidadPosiciones);
-
-	simuladorEntrada->setPipePrincipal(this->pipePpal);
-	simuladorEntrada->setPipeEntrada(pipeEntrada);
-	simuladorEntrada->simular();
+	simuladorEntrada->simular(pipeEntrada, this->pipePpal);
 
 	pipeEntrada.cerrar();
 	delete simuladorEntrada;
@@ -512,14 +506,12 @@ void Estacionamiento::correrSimuladorEntrada(int numeroEntrada,Pipe pipeEntrada,
 
 void Estacionamiento::correrSimuladorSalida(int numeroSalida,Pipe pipeSalida, int cantidadPosiciones)
 {
-	SimuladorSalida * simuladorSalida;
+	SimuladorSalida * simuladorSalida = new SimuladorSalida(numeroSalida,cantidadPosiciones);
 
-	simuladorSalida = new SimuladorSalida(numeroSalida,cantidadPosiciones);
+//	simuladorSalida->setPipePrincipal(this->pipePpal);
+//	simuladorSalida->setPipeSalida(pipeSalida);
 
-	simuladorSalida->setPipePrincipal(this->pipePpal);
-	simuladorSalida->setPipeSalida(pipeSalida);
-
-	simuladorSalida->simular();
+	simuladorSalida->simular(pipeSalida, this->pipePpal);
 
 	pipeSalida.cerrar();
 	delete simuladorSalida;

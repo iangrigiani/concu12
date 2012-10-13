@@ -28,8 +28,13 @@ private:
 	vector<int> vectorMemoriaPosicionesLibres;
 	MemoriaCompartida<Administracion> administracion;
 
-	Pipe pipeConsola;
+	// Pipe para la comunicacion de todas las entradas y la consola con el proceso principal. Todos escriben
+	// ahi y el proceso principal solo lee
 	Pipe pipePpal;
+
+	// Pipe para responder las consultas de la consola
+	Pipe pipeConsola;
+
 	Pipe pipeEntrada1;
 	Pipe pipeEntrada2;
 	Pipe pipeEntrada3;

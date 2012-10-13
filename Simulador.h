@@ -27,7 +27,7 @@ protected:
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
 	MemoriaCompartida<Administracion> administracion;
 
-	Pipe pipePpal;
+//	Pipe pipePpal;
 	int numero;
 
 	void inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosiciones);
@@ -43,8 +43,8 @@ public:
 	Simulador(int numero,int cantidadPosiciones);
 	virtual ~Simulador();
 
-	void setPipePrincipal(Pipe pipePrincipal);
-	Pipe getPipePrincipal();
+//	void setPipePrincipal(Pipe pipePrincipal);
+//	Pipe getPipePrincipal();
 };
 
 #endif /* SIMULADOR_H_ */
