@@ -54,6 +54,7 @@ int Pipe :: getFdEscritura () {
 }
 
 void Pipe :: cerrar () {
+
 	if ( this->lectura == true ) {
 		close ( this->descriptores[0] );
 		this->lectura = false;
@@ -63,7 +64,9 @@ void Pipe :: cerrar () {
 		close ( this->descriptores[1] );
 		this->escritura = false;
 	}
+
 }
 
 Pipe::~Pipe() {
+	this->cerrar();
 }

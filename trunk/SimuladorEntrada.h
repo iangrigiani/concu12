@@ -10,8 +10,6 @@ class SimuladorEntrada : public Simulador
 
 private:
 
-	Pipe pipeEntrada;
-
 	double getNumeroAleatorio();
 	bool modificarPosicionCompartida(int numeroPosicion);
 
@@ -28,10 +26,10 @@ public:
 
 	virtual ~SimuladorEntrada() {};
 
-	void simular();
+	void simular(Pipe pipeEntrada, Pipe pipePpal);
 
-	void setPipeEntrada(Pipe pipeEntrada);
-	Pipe getPipeEntrada();
+//	void setPipeEntrada(Pipe pipeEntrada);
+//	Pipe getPipeEntrada();
 
 	int getNumeroEntrada();
 

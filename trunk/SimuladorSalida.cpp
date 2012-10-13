@@ -7,18 +7,18 @@ SimuladorSalida::SimuladorSalida(int numeroSalida,int cantidadPosiciones) : Simu
 }
 
 
-void SimuladorSalida::setPipeSalida(Pipe pipeSalida)
-{
-	this->pipeSalida = pipeSalida;
-}
+//void SimuladorSalida::setPipeSalida(Pipe pipeSalida)
+//{
+//	this->pipeSalida = pipeSalida;
+//}
+//
+//Pipe SimuladorSalida::getPipeSalida()
+//{
+//	return this->pipeSalida;
+//}
 
-Pipe SimuladorSalida::getPipeSalida()
-{
-	return this->pipeSalida;
-}
 
-
-void SimuladorSalida::simular()
+void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 {
 	stringstream mensajeLog;
 	bool seguir = true;
@@ -26,7 +26,7 @@ void SimuladorSalida::simular()
 
 	while (seguir)
 	{
-		int bytes = this->pipeSalida.leer(recibido, BUFFSIZE);
+		int bytes = pipeSalida.leer(recibido, BUFFSIZE);
 		recibido[bytes] = '\0';
 
 		stringstream retorno;
@@ -59,7 +59,7 @@ void SimuladorSalida::simular()
 				param<<"d|";
 				param<<numeroPosicion;
 
-				this->pipePpal.escribir((char*)param.str().c_str(),BUFFSIZE);
+				pipePpal.escribir((char*)param.str().c_str(),param.str().length());
 
 				cout<<"Soy la salida "<<getNumeroSalida()<<" y le escribo al principal"<<endl;
 
@@ -70,7 +70,7 @@ void SimuladorSalida::simular()
 	}
 
 	cout << "Soy salida " << this->getNumeroSalida()<< " y numero proceso "<<getpid()<<" y muero ahora" << endl;
-	this->pipeSalida.cerrar();
+	pipeSalida.cerrar();
 
 }
 

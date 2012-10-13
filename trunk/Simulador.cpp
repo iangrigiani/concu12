@@ -71,14 +71,14 @@ void Simulador::inicializarMemoriaCompartidaAdministracion()
 }
 
 
-void Simulador::setPipePrincipal(Pipe pipePrincipal){
-	this->pipePpal = pipePrincipal;
-}
-
-Pipe Simulador::getPipePrincipal()
-{
-	return this->pipePpal;
-}
+//void Simulador::setPipePrincipal(Pipe pipePrincipal){
+//	this->pipePpal = pipePrincipal;
+//}
+//
+//Pipe Simulador::getPipePrincipal()
+//{
+//	return this->pipePpal;
+//}
 
 
 void Simulador::decrementarCantidadAutosEstacionamiento()

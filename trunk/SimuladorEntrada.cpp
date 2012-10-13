@@ -15,13 +15,13 @@ double SimuladorEntrada::getNumeroAleatorio()
 }
 
 
-void SimuladorEntrada::setPipeEntrada(Pipe pipeEntrada){
-	this->pipeEntrada = pipeEntrada;
-}
-
-Pipe SimuladorEntrada::getPipeEntrada(){
-	return this->pipeEntrada;
-}
+//void SimuladorEntrada::setPipeEntrada(Pipe pipeEntrada){
+//	this->pipeEntrada = pipeEntrada;
+//}
+//
+//Pipe SimuladorEntrada::getPipeEntrada(){
+//	return this->pipeEntrada;
+//}
 
 
 int SimuladorEntrada::getNumeroEntrada()
@@ -30,9 +30,18 @@ int SimuladorEntrada::getNumeroEntrada()
 }
 
 
-void SimuladorEntrada::simular(){
+void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 	pid_t w;
+
+
+	// Genero un vector dinamico y lo inicializo para evitar los warning de compilador y de valgrind
+	char recibir[BUFFSIZE];
+	int q;
+
+	for (q=0; q<BUFFSIZE; q++) {
+		recibir[q] = 0;
+	}
 
 	while (!Cronometro::obtenerCronometro()->llegoAlFinal())
 	{
@@ -50,15 +59,13 @@ void SimuladorEntrada::simular(){
 			if( pAuto ==  0)
 			{
 				cout << "Entrada " << this->getNumeroEntrada() << " Proceso hijo creado " << getpid() << endl;
-				char recibir[BUFFSIZE];
-				recibir[0] = '\0';
 
 				// Frena el proceso hasta que la entrada le diga si puede entrar o no
 				int bytes = pipeAuto.leer(recibir, BUFFSIZE);
 				int numeroPosicion = atoi(recibir);
 
 				// Si el numero de posicion es > 0 entonces hay lugar y el auto puede entrar
-				if (numeroPosicion > 0)
+				if (numeroPosicion > -1)
 				{
 
 					cout<<"Numero Posicion asignada al auto que entra  "<<numeroPosicion<<" en la entrada "<<this->getNumeroEntrada()<<endl;
@@ -85,17 +92,11 @@ void SimuladorEntrada::simular(){
 					salida<<"s|";
 					salida<<automovil->getNumeroPosicion();
 
-					this->pipePpal.escribir((char*)salida.str().c_str(),BUFFSIZE);
+					pipePpal.escribir((char*)salida.str().c_str(),salida.str().length());
 
 					delete(automovil);
-				}
-				else
-				{
-					//ESTO cuando el auto no pudo entrar al estacionamiento, se tiene que ir!!!
-					//TODO hay que matar al proceso que se creo ya que se tiene que ir y no quedar
-					//dando vueltas por ahi!!!
-
-					//Un KILL o algo asi??? de signal.h
+				} else {
+					cout << "Entrada " << this->getNumeroEntrada() << " Soy el auto pid: " << getpid() << " y no me dejaron entrar porque no hay lugar!" << endl;
 				}
 				pipeAuto.cerrar();
 				return;
@@ -118,20 +119,19 @@ void SimuladorEntrada::simular(){
 
 					//Agregar semaforo para sincronizar el acceso
 					//Pido una ubicacion libre al servidor
-					this->pipePpal.escribir((char*)nroEntrada.str().c_str(),BUFFSIZE);
+					pipePpal.escribir((char*)nroEntrada.str().c_str(),nroEntrada.str().length());
 
-					char recibir[BUFFSIZE];
-					recibir[0] = '\0';
 
 					//Espero la respuesta y la guardo en la variable recibir
-					this->pipeEntrada.leer(recibir, BUFFSIZE);
+					pipeEntrada.leer(recibir, BUFFSIZE);
 
-					int numeroPosicion = atoi(recibir);
+					int numeroPosicion = 0;
+					numeroPosicion = atoi(recibir);
 
 					//Si devuelve un nro negativo, entonces no hay lugar y el auto no puede ingresar
 					if (numeroPosicion < 0)
 					{
-						pipeAuto.escribir(recibir,BUFFSIZE);
+						pipeAuto.escribir(recibir,strlen(recibir));
 						cicloCompleto = true;
 					}
 					else
@@ -143,7 +143,7 @@ void SimuladorEntrada::simular(){
 
 						if (pudeOcuparPosicion)
 						{
-							pipeAuto.escribir(recibir,BUFFSIZE);
+							pipeAuto.escribir(recibir,strlen(recibir));
 
 							//Tengo que avisarle al proceso principal que saque del vector de posiciones libres
 							//la posicion que me asigno recien (le paso el nro por el pipe: p|nroPosicion )
@@ -154,7 +154,7 @@ void SimuladorEntrada::simular(){
 							param<<"p|";
 							param<<numeroPosicion;
 
-							this->pipePpal.escribir((char*)param.str().c_str(),BUFFSIZE);
+							pipePpal.escribir((char*)param.str().c_str(),param.str().length());
 
 
 							this->incrementarCantidadDeAutosEstacionamiento();
@@ -162,6 +162,8 @@ void SimuladorEntrada::simular(){
 
 
 							cicloCompleto = true;
+						} else {
+							cout << "Entrada " << this->getNumeroEntrada() << " no puedo ocupar posicion: " << numeroPosicion << endl;
 						}
 
 					}
@@ -198,7 +200,7 @@ void SimuladorEntrada::simular(){
 	numeroEntrada<<"f|";
 	numeroEntrada<<this->getNumeroEntrada();
 
-	this->pipePpal.escribir((char*)numeroEntrada.str().c_str(),BUFFSIZE);
+	pipePpal.escribir((char*)numeroEntrada.str().c_str(),numeroEntrada.str().length());
 
 	cout << "Soy entrada " << this->getNumeroEntrada() << " y muero ahora" << endl;
 
