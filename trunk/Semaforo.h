@@ -15,7 +15,7 @@ private:
 
 public:
 	Semaforo();
-	Semaforo ( const char* nombre,int valorInicial );
+	Semaforo ( const char* nombre,int valorInicial,char id);
 	virtual ~Semaforo();
 
 	int p (); // decrementa

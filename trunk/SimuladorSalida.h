@@ -8,18 +8,15 @@ class SimuladorSalida : public Simulador {
 
 
 private:
-		//Pipe pipeSalida;
 
 		void liberarLugar(int numeroPosicion);
+		void decrementarCantidadAutosEstacionamiento();
 
 public:
 
 	SimuladorSalida(int numeroSalida,int cantidadPosiciones);
 
 	virtual ~SimuladorSalida() {};
-
-//	void setPipeSalida(Pipe pipeSalida);
-//	Pipe getPipeSalida();
 
 	void simular(Pipe pipeEntrada, Pipe pipePpal);
 

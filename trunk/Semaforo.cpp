@@ -5,17 +5,18 @@ Semaforo::Semaforo(){
 	this->id = 0;
 	this->valorInicial=0;
 }
-Semaforo :: Semaforo ( const char* nombre,int valorInicial ) {
+Semaforo :: Semaforo ( const char* nombre,int valorInicial,char id ) {
 
 	this->valorInicial = valorInicial;
 
-	key_t clave = ftok ( nombre,'a' );
+	key_t clave = ftok ( nombre,id );
 	this->id = semget ( clave,1,0666 | IPC_CREAT );
 
 	this->inicializar ();
 }
 
-Semaforo::~Semaforo() {
+Semaforo::~Semaforo()
+{
 }
 
 int Semaforo :: inicializar () {
