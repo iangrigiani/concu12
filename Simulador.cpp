@@ -9,6 +9,10 @@ Simulador::Simulador(int numero, int cantidadPosiciones)
 
 	this->numero = numero;
 
+	Semaforo smfAdmininstracion(ARCHIVO_SEMAFORO_ADMINISTRACION,1);
+
+	this->smfAdministracion = smfAdministracion;
+
 }
 
 Simulador::~Simulador()
@@ -71,18 +75,12 @@ void Simulador::inicializarMemoriaCompartidaAdministracion()
 }
 
 
-//void Simulador::setPipePrincipal(Pipe pipePrincipal){
-//	this->pipePpal = pipePrincipal;
-//}
-//
-//Pipe Simulador::getPipePrincipal()
-//{
-//	return this->pipePpal;
-//}
-
-
 void Simulador::decrementarCantidadAutosEstacionamiento()
 {
+
+	// Tomo el semaforo
+	this->smfAdministracion.p();
+
 	Administracion admin = (Administracion)this->administracion.leer();
 
 	int cantAutos = admin.getCantidadDeAutos();
@@ -90,14 +88,23 @@ void Simulador::decrementarCantidadAutosEstacionamiento()
 
 	this->administracion.escribir(admin);
 
-	Administracion admin2 = (Administracion)this->administracion.leer();
-	cout<<"Al decrementar en la salida "<<this->numero<<"antes "<<cantAutos<<" se leen ahora "<<admin2.getCantidadDeAutos()<<endl;
+	// Libero el semaforo
+	this->smfAdministracion.v();
+
+//	Administracion admin2 = (Administracion)this->administracion.leer();
+//	cout<<"Al decrementar en la salida "<<this->numero<<"antes "<<cantAutos<<" se leen ahora "<<admin2.getCantidadDeAutos()<<endl;
 
 }
 
 int Simulador::getCantidadAutosEstacionamiento()
 {
+	// Tomo el semaforo
+	this->smfAdministracion.p();
+
 	Administracion admin = (Administracion)this->administracion.leer();
+
+	// Libero el semaforo
+	this->smfAdministracion.v();
 
 	return admin.getCantidadDeAutos();
 

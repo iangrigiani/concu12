@@ -4,6 +4,7 @@
 
 
 #include "Simulador.h"
+#include "Semaforo.h"
 
 class SimuladorEntrada : public Simulador
 {
@@ -18,7 +19,7 @@ private:
 
 	int cantidadAutos;
 
-
+	Semaforo semaforo;
 
 public:
 

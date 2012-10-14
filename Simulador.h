@@ -17,6 +17,7 @@
 #include "Constantes.h"
 #include "Utils.h"
 #include "Log.h"
+#include "Semaforo.h"
 
 
 
@@ -37,6 +38,8 @@ protected:
 
 	int getCantidadAutosEstacionamiento();
 
+	// Semaforo para la administracion
+	Semaforo smfAdministracion;
 
 public:
 
