@@ -23,31 +23,32 @@
 
 class Simulador {
 
+
+private:
+
+	void inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosiciones);
+	void inicializarMemoriaCompartidaAdministracion();
+
 protected:
 
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
 	MemoriaCompartida<Administracion> administracion;
 
-//	Pipe pipePpal;
-	int numero;
+	// Semaforo para la administracion
+	Semaforo smfAdministracion;
 
-	void inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosiciones);
-	void inicializarMemoriaCompartidaAdministracion();
+	//Vector de semaforos para bloquear cada una de las posiciones
+    vector<Semaforo> semaforos;
 
-	void decrementarCantidadAutosEstacionamiento();
+    int numero;
 
 	int getCantidadAutosEstacionamiento();
 
-	// Semaforo para la administracion
-	Semaforo smfAdministracion;
 
 public:
 
 	Simulador(int numero,int cantidadPosiciones);
 	virtual ~Simulador();
-
-//	void setPipePrincipal(Pipe pipePrincipal);
-//	Pipe getPipePrincipal();
 };
 
 #endif /* SIMULADOR_H_ */

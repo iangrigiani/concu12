@@ -9,14 +9,24 @@ Simulador::Simulador(int numero, int cantidadPosiciones)
 
 	this->numero = numero;
 
-	Semaforo smfAdmininstracion(ARCHIVO_SEMAFORO_ADMINISTRACION,1);
 
-	this->smfAdministracion = smfAdministracion;
+	Semaforo smfAdmin(ARCHIVO_SEMAFORO_ADMINISTRACION,1,'a');
+	this->smfAdministracion = smfAdmin;
+
 
 }
 
 Simulador::~Simulador()
 {
+	 // Elimino los semaforos
+	  vector<Semaforo>::iterator itSemaforos = this->semaforos.begin();
+		while(itSemaforos != this->semaforos.end()){
+				itSemaforos->eliminar();
+				itSemaforos++;
+		}
+
+		//Habria que eliminar administracion o como ya lo esta haciendo estacionamiento
+		// no hace falta??? Porque es el mismo semaforo
 
 }
 
@@ -39,8 +49,13 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 		int estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
 
 		if ( estadoMemoria == SHM_OK )
+		{
 			this->vectorMemoriaPosiciones.push_back(memoria);
 
+			//Creo un semaforo por cada posicion inicializada
+			Semaforo semaforo((char*)ARCHIVO_SEMAFORO_POSICIONES, 1, (char) i);
+			this->semaforos.push_back(semaforo);
+		}
 		else
 		{
 			mensajeLog<<"Error al inicializar el vector de memoria compartida en la posicion "<<i<<" en el simulador";
@@ -75,26 +90,7 @@ void Simulador::inicializarMemoriaCompartidaAdministracion()
 }
 
 
-void Simulador::decrementarCantidadAutosEstacionamiento()
-{
 
-	// Tomo el semaforo
-	this->smfAdministracion.p();
-
-	Administracion admin = (Administracion)this->administracion.leer();
-
-	int cantAutos = admin.getCantidadDeAutos();
-	admin.decrementarCantidadAutos();
-
-	this->administracion.escribir(admin);
-
-	// Libero el semaforo
-	this->smfAdministracion.v();
-
-//	Administracion admin2 = (Administracion)this->administracion.leer();
-//	cout<<"Al decrementar en la salida "<<this->numero<<"antes "<<cantAutos<<" se leen ahora "<<admin2.getCantidadDeAutos()<<endl;
-
-}
 
 int Simulador::getCantidadAutosEstacionamiento()
 {

@@ -29,9 +29,6 @@ public:
 
 	void simular(Pipe pipeEntrada, Pipe pipePpal);
 
-//	void setPipeEntrada(Pipe pipeEntrada);
-//	Pipe getPipeEntrada();
-
 	int getNumeroEntrada();
 
 

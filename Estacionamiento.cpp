@@ -3,9 +3,10 @@
 
 
 Estacionamiento::Estacionamiento() {
-	Semaforo smfAdmininstracion(ARCHIVO_SEMAFORO_ADMINISTRACION,1);
 
-	this->smfAdministracion = smfAdministracion;
+	Semaforo smfAdmin(ARCHIVO_SEMAFORO_ADMINISTRACION,1,'a');
+
+	this->smfAdministracion = smfAdmin;
 }
 
 
@@ -510,9 +511,6 @@ void Estacionamiento::correrSimuladorEntrada(int numeroEntrada,Pipe pipeEntrada,
 void Estacionamiento::correrSimuladorSalida(int numeroSalida,Pipe pipeSalida, int cantidadPosiciones)
 {
 	SimuladorSalida * simuladorSalida = new SimuladorSalida(numeroSalida,cantidadPosiciones);
-
-//	simuladorSalida->setPipePrincipal(this->pipePpal);
-//	simuladorSalida->setPipeSalida(pipeSalida);
 
 	simuladorSalida->simular(pipeSalida, this->pipePpal);
 

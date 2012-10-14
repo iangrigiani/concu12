@@ -7,17 +7,6 @@ SimuladorSalida::SimuladorSalida(int numeroSalida,int cantidadPosiciones) : Simu
 }
 
 
-//void SimuladorSalida::setPipeSalida(Pipe pipeSalida)
-//{
-//	this->pipeSalida = pipeSalida;
-//}
-//
-//Pipe SimuladorSalida::getPipeSalida()
-//{
-//	return this->pipeSalida;
-//}
-
-
 void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 {
 	stringstream mensajeLog;
@@ -82,23 +71,51 @@ int SimuladorSalida::getNumeroSalida()
 
 void SimuladorSalida::liberarLugar(int numeroPosicion)
 {
-	//TODO Semaforos!!!
-
 	MemoriaCompartida<Posicion> memoria;
 	Posicion posicion;
+
+	//Bloqueo la posicion
+	semaforos[numeroPosicion].p();
+
+	memoria = this->vectorMemoriaPosiciones[numeroPosicion];
+	posicion = (Posicion) memoria.leer();
+	posicion.setEstadoOcupado(false);
+
+	memoria.escribir(posicion);
+
+	this->vectorMemoriaPosiciones[numeroPosicion] = memoria;
+
+	//Desbloqueo la posicion
+	semaforos[numeroPosicion].v();
 
 	stringstream mensajeLog;
 
 	mensajeLog << "Memoria Compartida : soy la salida "<< this->getNumeroSalida()<<" y modifico la posicion " << numeroPosicion <<" poniendola como libre en el vector de posiciones.";
 
 	Log::getInstance()->loguear(mensajeLog.str());
-
-	memoria = this->vectorMemoriaPosiciones[numeroPosicion];
-
-	posicion.setNumero(numeroPosicion);
-	posicion.setEstadoOcupado(true);
-	memoria.escribir(posicion);
-	this->vectorMemoriaPosiciones[numeroPosicion] = memoria;
-
 }
 
+
+void SimuladorSalida::decrementarCantidadAutosEstacionamiento()
+{
+
+	// Tomo el semaforo
+	this->smfAdministracion.p();
+
+	Administracion admin = (Administracion)this->administracion.leer();
+
+	admin.decrementarCantidadAutos();
+
+	this->administracion.escribir(admin);
+
+	// Libero el semaforo
+	this->smfAdministracion.v();
+
+	stringstream mensajeLog;
+
+	mensajeLog <<"Se registra la salida de un auto al estacionamiento habiendo en total: "<<admin.getCantidadDeAutos();
+
+	Log::getInstance()->loguear(mensajeLog.str());
+
+
+}

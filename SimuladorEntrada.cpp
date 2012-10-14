@@ -15,14 +15,6 @@ double SimuladorEntrada::getNumeroAleatorio()
 }
 
 
-//void SimuladorEntrada::setPipeEntrada(Pipe pipeEntrada){
-//	this->pipeEntrada = pipeEntrada;
-//}
-//
-//Pipe SimuladorEntrada::getPipeEntrada(){
-//	return this->pipeEntrada;
-//}
-
 
 int SimuladorEntrada::getNumeroEntrada()
 {
@@ -83,7 +75,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 					this->incrementarMontoRecaudado(horas);
 
-					//this->cantidadAutos--;
+					this->cantidadAutos--;
 
 					//Pipe al principal para que le avise que tiene que sacar el auto
 					//del estacionamiento y agregar la posicion nuevamente en la lista de posiciones libres
@@ -91,6 +83,8 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 					salida<<"s|";
 					salida<<automovil->getNumeroPosicion();
+
+					cout<<"La posicion que dejo es "<<automovil->getNumeroPosicion()<<" y la salida es "<<salida.str()<<endl;
 
 					pipePpal.escribir((char*)salida.str().c_str(),salida.str().length());
 
@@ -128,6 +122,8 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 					int numeroPosicion = 0;
 					numeroPosicion = atoi(recibir);
 
+					cout<<"Soy la entrada "<<this->getNumeroEntrada()<<" y recibi la posicion "<<numeroPosicion<<endl;
+
 					//Si devuelve un nro negativo, entonces no hay lugar y el auto no puede ingresar
 					if (numeroPosicion < 0)
 					{
@@ -137,12 +133,13 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 					else
 					{
 
-						//TODO semaforo
 						//Aca intento tomar escribir en esa posicion de memoria para ocuparla, si no puedo, busco otra
 						bool pudeOcuparPosicion = this->modificarPosicionCompartida(numeroPosicion);
 
 						if (pudeOcuparPosicion)
 						{
+							cout<<"Soy la entrada "<<this->getNumeroEntrada()<<"y pude ocupar la posicion "<<numeroPosicion<<endl;
+
 							pipeAuto.escribir(recibir,strlen(recibir));
 
 							//Tengo que avisarle al proceso principal que saque del vector de posiciones libres
@@ -153,6 +150,8 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 							param<<"p|";
 							param<<numeroPosicion;
+
+							cout<<"Soy la entrada "<<this->getNumeroEntrada()<<" y le envio al principal "<<param.str()<<endl;
 
 							pipePpal.escribir((char*)param.str().c_str(),param.str().length());
 
@@ -177,7 +176,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 		}
 		sleep(1);
 
-		cout << "Entrada " << this->getNumeroEntrada() << " Cantidad de autos: " << this->cantidadAutos << endl;
+		//cout << "Entrada " << this->getNumeroEntrada() << " Cantidad de autos: " << this->cantidadAutos << endl;
 	}
 
 
@@ -212,25 +211,40 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 bool SimuladorEntrada::modificarPosicionCompartida(int numeroPosicion)
 {
-	//TODO Semaforos!!!
-	bool pudoOcuparPosicion = true;
+
 	MemoriaCompartida<Posicion> memoria;
 	Posicion posicion;
 
-	stringstream mensajeLog;
-
-	mensajeLog << "Memoria Compartida : soy la entrada "<< this->getNumeroEntrada()<<" y modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
-
-	Log::getInstance()->loguear(mensajeLog.str());
+	//Bloqueo la posicion
+	semaforos[numeroPosicion].p();
 
 	memoria = this->vectorMemoriaPosiciones[numeroPosicion];
+	posicion = (Posicion)memoria.leer();
 
-	posicion.setNumero(numeroPosicion);
-	posicion.setEstadoOcupado(true);
-	memoria.escribir(posicion);
-	this->vectorMemoriaPosiciones[numeroPosicion] = memoria;
+	//Si la posicion ya no fue ocupada
+	if(!posicion.getEstadoOcupado())
+	{
+		posicion.setEstadoOcupado(true);
+		memoria.escribir(posicion);
+		this->vectorMemoriaPosiciones[numeroPosicion] = memoria;
 
-	return pudoOcuparPosicion;
+	}
+
+	//Desbloqueo la posicion
+	semaforos[numeroPosicion].v();
+
+	if(posicion.getEstadoOcupado())
+	{
+
+		stringstream mensajeLog;
+
+		mensajeLog << "Memoria Compartida : soy la entrada "<< this->getNumeroEntrada()<<" y modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
+
+		Log::getInstance()->loguear(mensajeLog.str());
+	}
+
+	//Si devuelve true es que pudo ocupar la posicion, sino no pudo y devuelve false.
+	return posicion.getEstadoOcupado();
 
 }
 
