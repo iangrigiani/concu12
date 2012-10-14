@@ -236,13 +236,17 @@ bool SimuladorEntrada::modificarPosicionCompartida(int numeroPosicion)
 
 void SimuladorEntrada::incrementarCantidadDeAutosEstacionamiento()
 {
-	Administracion admin = (Administracion)this->administracion.leer();
+	// Tomo el semaforo
+	this->smfAdministracion.p();
 
-	//cout<<"Entrada : "<<this->entrada->getNumeroDeEntrada()<<" Hay "<<admin.getCantidadDeAutos()<<" en el estacionamiento"<<endl;
+	Administracion admin = (Administracion)this->administracion.leer();
 
 	admin.incrementarCantidadAutos();
 
 	this->administracion.escribir(admin);
+
+	// Libero el semaforo
+	this->smfAdministracion.v();
 
 	stringstream mensajeLog;
 
@@ -251,16 +255,15 @@ void SimuladorEntrada::incrementarCantidadDeAutosEstacionamiento()
 	Log::getInstance()->loguear(mensajeLog.str());
 
 
-	//ESTO ERA PARA SABER SI ESCRIBIA BIEN Y SI AL LEER SE OBTIENE EL DATO MODIFICADO
-	//Administracion administracion2 = (Administracion)this->administracion.leer();
-	//cout<<"Entrada : "<<this->entrada->getNumeroDeEntrada()<<"Y como ingresa un auto ahora hay "<<administracion2.getCantidadDeAutos()<<endl;
-
-
 }
 
 
 void SimuladorEntrada::incrementarMontoRecaudado(int horas)
 {
+
+	// Tomo el semaforo
+	this->smfAdministracion.p();
+
 	Administracion admin = (Administracion)this->administracion.leer();
 
 	admin.actualizarImporteRecaudado(horas);
@@ -270,6 +273,9 @@ void SimuladorEntrada::incrementarMontoRecaudado(int horas)
 	stringstream mensajeLog;
 
 	mensajeLog <<"El importe total registrado hasta el momento es : "<<admin.getImporteRecaudado();
+
+	// Libero el semaforo
+	this->smfAdministracion.v();
 
 	Log::getInstance()->loguear(mensajeLog.str());
 

@@ -1,6 +1,11 @@
 #include "Semaforo.h"
 
-Semaforo :: Semaforo ( char* nombre,int valorInicial ) {
+
+Semaforo::Semaforo(){
+	this->id = 0;
+	this->valorInicial=0;
+}
+Semaforo :: Semaforo ( const char* nombre,int valorInicial ) {
 
 	this->valorInicial = valorInicial;
 
@@ -54,3 +59,4 @@ int Semaforo :: v () {
 void Semaforo :: eliminar () {
 	semctl ( this->id,0,IPC_RMID );
 }
+

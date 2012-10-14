@@ -3,12 +3,15 @@
 
 
 Estacionamiento::Estacionamiento() {
+	Semaforo smfAdmininstracion(ARCHIVO_SEMAFORO_ADMINISTRACION,1);
+
+	this->smfAdministracion = smfAdministracion;
 }
 
 
 Estacionamiento::~Estacionamiento()
 {
-
+	this->smfAdministracion.eliminar();
 }
 
 
@@ -597,13 +600,29 @@ void Estacionamiento::agregarPosicionLibre(int numeroPosicion)
 
 int Estacionamiento::obtenerCantidadActualDeAutos()
 {
+	// Tomo el semaforo para lectura
+	this->smfAdministracion.p();
+
 	Administracion administracion = (Administracion)this->administracion.leer();
+
+	// Libero el semaforo
+	this->smfAdministracion.v();
+
 	return administracion.getCantidadDeAutos();
 }
 
 float Estacionamiento::obtenerMontoRecaudado()
 {
+
+	// Tomo el semaforo para lectura
+	this->smfAdministracion.p();
+
+	cout << "PPAL: Acabo de tomar el semaforo de admin " << endl;
 	Administracion administracion = (Administracion)this->administracion.leer();
+
+	// Libero el semaforo
+	this->smfAdministracion.v();
+	cout << "PPAL: Libero el semaforo de admin " << endl;
 	return administracion.getImporteRecaudado();
 }
 

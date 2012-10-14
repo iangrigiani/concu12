@@ -17,6 +17,8 @@
 #include "Constantes.h"
 #include "Log.h"
 #include "Pipe.h"
+#include "Semaforo.h"
+
 
 using namespace std;
 
@@ -40,6 +42,9 @@ private:
 	Pipe pipeEntrada3;
 	Pipe pipeSalida1;
 	Pipe pipeSalida2;
+
+	// Semaforo para la administracion
+	Semaforo smfAdministracion;
 
 	void crearArchivosTemporales(int cantidadLugares);
 
