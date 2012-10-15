@@ -75,7 +75,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 					this->incrementarMontoRecaudado(horas);
 
-					this->cantidadAutos--;
+					//this->cantidadAutos--;
 
 					//Pipe al principal para que le avise que tiene que sacar el auto
 					//del estacionamiento y agregar la posicion nuevamente en la lista de posiciones libres
@@ -176,7 +176,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 		}
 		sleep(1);
 
-		//cout << "Entrada " << this->getNumeroEntrada() << " Cantidad de autos: " << this->cantidadAutos << endl;
+		cout << "Entrada " << this->getNumeroEntrada() << " Cantidad de autos: " << this->cantidadAutos << endl;
 	}
 
 
