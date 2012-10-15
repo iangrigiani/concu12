@@ -46,7 +46,11 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 		if ( numeroAlearorio < flujoDeAutos )
 		{
 			Pipe pipeAuto;
+
 			pid_t pAuto = fork();
+
+			// Aumento la variable que me indica la cantidad de proceso hijos creados
+			this->cantidadAutos++;
 
 			if( pAuto ==  0)
 			{
@@ -54,7 +58,11 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 				// Frena el proceso hasta que la entrada le diga si puede entrar o no
 				int bytes = pipeAuto.leer(recibir, BUFFSIZE);
-				int numeroPosicion = atoi(recibir);
+
+				string stringRecibido(recibir);
+				stringRecibido = stringRecibido.substr(0, bytes);
+
+				int numeroPosicion = atoi(stringRecibido.c_str());
 
 				// Si el numero de posicion es > 0 entonces hay lugar y el auto puede entrar
 				if (numeroPosicion > -1)
@@ -64,14 +72,14 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 					double horasAleatoriasEstadia = this->getNumeroAleatorio();
 					int horas = ceil(50*horasAleatoriasEstadia);
-					Auto * automovil = new Auto(horas);
-					automovil->setNumeroPosicion(numeroPosicion);
+					Auto automovil(horas);
+					automovil.setNumeroPosicion(numeroPosicion);
 
 
 					cout << "Entrada " << this->getNumeroEntrada() << " Soy el auto pid: " << getpid() << " y entro en la posicion: " << numeroPosicion << endl;
 
 					//El auto duerme el tiempo que permanece en el estacionamiento
-					automovil->run();
+					automovil.run();
 
 					this->incrementarMontoRecaudado(horas);
 
@@ -82,13 +90,12 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 					stringstream salida;
 
 					salida<<"s|";
-					salida<<automovil->getNumeroPosicion();
+					salida<<automovil.getNumeroPosicion();
 					salida<<"?";
-					cout<<"La posicion que dejo es "<<automovil->getNumeroPosicion()<<" y la salida es "<<salida.str()<<endl;
+					cout<<"La posicion que dejo es "<<automovil.getNumeroPosicion()<<" y la salida es "<<salida.str()<<endl;
 
 					pipePpal.escribir((char*)salida.str().c_str(),salida.str().length());
 
-					delete(automovil);
 				} else {
 					cout << "Entrada " << this->getNumeroEntrada() << " Soy el auto pid: " << getpid() << " y no me dejaron entrar porque no hay lugar!" << endl;
 				}
@@ -118,17 +125,20 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 
 					//Espero la respuesta y la guardo en la variable recibir
-					pipeEntrada.leer(recibir, BUFFSIZE);
+					int bytes = pipeEntrada.leer(recibir, BUFFSIZE);
+
+					string stringRecibido(recibir);
+					stringRecibido = stringRecibido.substr(0, bytes);
 
 					int numeroPosicion = 0;
-					numeroPosicion = atoi(recibir);
+					numeroPosicion = atoi((char*)stringRecibido.c_str());
 
 					cout<<"Soy la entrada "<<this->getNumeroEntrada()<<" y recibi la posicion "<<numeroPosicion<<endl;
 
 					//Si devuelve un nro negativo, entonces no hay lugar y el auto no puede ingresar
 					if (numeroPosicion < 0)
 					{
-						pipeAuto.escribir(recibir,strlen(recibir));
+						pipeAuto.escribir((char*)stringRecibido.c_str(),bytes);
 						cicloCompleto = true;
 					}
 					else
@@ -141,7 +151,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 						{
 							cout<<"Soy la entrada "<<this->getNumeroEntrada()<<"y pude ocupar la posicion "<<numeroPosicion<<endl;
 
-							pipeAuto.escribir(recibir,strlen(recibir));
+							pipeAuto.escribir((char*)stringRecibido.c_str(),bytes);
 
 							//Tengo que avisarle al proceso principal que saque del vector de posiciones libres
 							//la posicion que me asigno recien (le paso el nro por el pipe: p|nroPosicion )
@@ -159,8 +169,6 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 
 							this->incrementarCantidadDeAutosEstacionamiento();
-							this->cantidadAutos++;
-
 
 							cicloCompleto = true;
 						} else {
@@ -218,6 +226,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 bool SimuladorEntrada::modificarPosicionCompartida(int numeroPosicion)
 {
 
+	bool pude = false;
 	MemoriaCompartida<Posicion> memoria;
 	Posicion posicion;
 
@@ -233,24 +242,21 @@ bool SimuladorEntrada::modificarPosicionCompartida(int numeroPosicion)
 		posicion.setEstadoOcupado(true);
 		memoria.escribir(posicion);
 		this->vectorMemoriaPosiciones[numeroPosicion] = memoria;
-
+		pude = true;
 	}
 
 	//Desbloqueo la posicion
 	semaforos[numeroPosicion].v();
 
-	if(posicion.getEstadoOcupado())
+	if(pude)
 	{
-
 		stringstream mensajeLog;
-
 		mensajeLog << "Memoria Compartida : soy la entrada "<< this->getNumeroEntrada()<<" y modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
-
 		Log::getInstance()->loguear(mensajeLog.str());
 	}
 
 	//Si devuelve true es que pudo ocupar la posicion, sino no pudo y devuelve false.
-	return posicion.getEstadoOcupado();
+	return pude;
 
 }
 

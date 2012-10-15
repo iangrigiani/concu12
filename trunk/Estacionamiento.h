@@ -18,6 +18,7 @@
 #include "Log.h"
 #include "Pipe.h"
 #include "Semaforo.h"
+#include <algorithm>
 
 
 using namespace std;
@@ -85,6 +86,8 @@ private:
 	void agregarPosicionLibre(int numeroPosicion);
 
 	int busquedaBinariaVectorLibres(int inicio,int fin,int buscado);
+
+	int insercionBinariaVectorLibres(int inicio,int fin,int buscado);
 
 	void liberarMemoriaCompartida(int cantidadLugares);
 
