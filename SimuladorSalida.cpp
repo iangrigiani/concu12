@@ -47,6 +47,7 @@ void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 
 				param<<"d|";
 				param<<numeroPosicion;
+				param<<"?";
 
 				pipePpal.escribir((char*)param.str().c_str(),param.str().length());
 

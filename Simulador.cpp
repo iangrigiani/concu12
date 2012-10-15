@@ -13,7 +13,6 @@ Simulador::Simulador(int numero, int cantidadPosiciones)
 	Semaforo smfAdmin(ARCHIVO_SEMAFORO_ADMINISTRACION,1,'a');
 	this->smfAdministracion = smfAdmin;
 
-
 }
 
 Simulador::~Simulador()

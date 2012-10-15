@@ -10,6 +10,7 @@ const char* const ARCHIVO_ADMINISTRACION = "/tmp/tmpAdministracion";
 const char* const ARCHIVO_SEMAFORO_ADMINISTRACION = "/tmp/tmpSmfAdministracion";
 const char* const ARCHIVO_SEMAFORO_POSICIONES = "/tmp/tmpSmfPosiciones";
 
+
 //LOG
 const int PRECISION_SEGUNDOS = 6;
 const char* const PATH_LOG = "Log";
