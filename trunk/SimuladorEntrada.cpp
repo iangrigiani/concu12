@@ -83,7 +83,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 					salida<<"s|";
 					salida<<automovil->getNumeroPosicion();
-
+					salida<<"?";
 					cout<<"La posicion que dejo es "<<automovil->getNumeroPosicion()<<" y la salida es "<<salida.str()<<endl;
 
 					pipePpal.escribir((char*)salida.str().c_str(),salida.str().length());
@@ -107,6 +107,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 				stringstream nroEntrada;
 				nroEntrada << this->getNumeroEntrada();
+				nroEntrada << "?";
 
 				while (!cicloCompleto)
 				{
@@ -150,6 +151,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 							param<<"p|";
 							param<<numeroPosicion;
+							param<<"?";
 
 							cout<<"Soy la entrada "<<this->getNumeroEntrada()<<" y le envio al principal "<<param.str()<<endl;
 
@@ -194,11 +196,15 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 	}
 
+
 	//Envia un pipe al principal para que le diga que tiene que finalizar el ciclo a la salida.
 	stringstream numeroEntrada;
 	numeroEntrada<<"f|";
 	numeroEntrada<<this->getNumeroEntrada();
+	numeroEntrada<<"?";
 
+
+	cout << "Soy entrada " << this->getNumeroEntrada() << " y escribo: " << numeroEntrada.str() << endl;
 	pipePpal.escribir((char*)numeroEntrada.str().c_str(),numeroEntrada.str().length());
 
 	cout << "Soy entrada " << this->getNumeroEntrada() << " y muero ahora" << endl;

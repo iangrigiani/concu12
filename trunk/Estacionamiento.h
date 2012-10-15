@@ -43,8 +43,24 @@ private:
 	Pipe pipeSalida1;
 	Pipe pipeSalida2;
 
+	//Pids
+	pid_t pEntrada1;
+	pid_t pEntrada2;
+	pid_t pEntrada3;
+
+	pid_t pSalida1;
+	pid_t pSalida2;
+	pid_t pConsola;
+
 	// Semaforo para la administracion
 	Semaforo smfAdministracion;
+
+
+	void finalizarProcesos();
+
+	void finalizarPipes();
+
+	void crearIniciales(int cantidadDeLugares, int costoHora);
 
 	void crearArchivosTemporales(int cantidadLugares);
 
