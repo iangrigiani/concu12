@@ -145,7 +145,6 @@ void Estacionamiento::crearVectorPosicionesLibres(int cantidadLugares)
 		mensajeLog.flush();
 	}
 
-
 }
 
 void Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
@@ -526,27 +525,11 @@ int Estacionamiento::getPosicionAleatoria()
 		return -1;
 
 	int numeroElegido;
-	int indiceActual = 0;
-	int posicionElegida = 0;
 
 	srand((unsigned)time(0));
 	numeroElegido = calcularRandom(cantidadPosiciones);
 
-	vector<int>::iterator it = this->vectorMemoriaPosicionesLibres.begin();
-
-	 while ( it != this->vectorMemoriaPosicionesLibres.end())
-	 {
-		 if(indiceActual == numeroElegido)
-		 {
-			 posicionElegida = this->vectorMemoriaPosicionesLibres[indiceActual];
-			 break;
-		 }
-
-		 ++it;
-		 indiceActual++;
-	 }
-
-	 return posicionElegida;
+	return this->vectorMemoriaPosicionesLibres[numeroElegido];
 
 }
 
@@ -558,19 +541,37 @@ int Estacionamiento::getSalidaAleatoria()
 void Estacionamiento::quitarPosicionLibre(int numeroPosicion)
 {
 	int inicio = 0;
-	int fin = this->vectorMemoriaPosicionesLibres.size()-1;
+	int tam = this->vectorMemoriaPosicionesLibres.size();
+	int fin = tam-1;
 
 	int posicionBuscada = busquedaBinariaVectorLibres(inicio,fin,numeroPosicion);
 
+	stringstream mensajeLog;
+	mensajeLog << "Posicion buscada =  " << posicionBuscada << endl;
+	Log::getInstance()->loguear(mensajeLog.str());
+
 	this->vectorMemoriaPosicionesLibres.erase (this->vectorMemoriaPosicionesLibres.begin()+posicionBuscada);
 
+	int a;
+	mensajeLog << "Contenido array: ";
+
+	for(a=0;a<tam-1;a++){
+		mensajeLog << this->vectorMemoriaPosicionesLibres[a] << "-";
+	}
+	mensajeLog << endl;
+	Log::getInstance()->loguear(mensajeLog.str());
 }
 
 
 int Estacionamiento::busquedaBinariaVectorLibres(int inicio,int fin,int buscado)
 {
-	if (inicio > fin)
+	if (inicio > fin) {
+		stringstream mensajeLog;
+		mensajeLog << "Buscado: " << buscado << " Inicio =  " << inicio << " Fin " << fin  <<endl;
+		Log::getInstance()->loguear(mensajeLog.str());
+
 		return -1;
+	}
 	else {
 		  int pos = (inicio + fin) / 2;
 		  if (buscado < this->vectorMemoriaPosicionesLibres[pos])
@@ -586,7 +587,22 @@ int Estacionamiento::busquedaBinariaVectorLibres(int inicio,int fin,int buscado)
 
 void Estacionamiento::agregarPosicionLibre(int numeroPosicion)
 {
+
+	stringstream mensajeLog;
+
 	this->vectorMemoriaPosicionesLibres.push_back(numeroPosicion);
+
+	sort(this->vectorMemoriaPosicionesLibres.begin(), this->vectorMemoriaPosicionesLibres.end());
+
+	int a;
+	int tam = this->vectorMemoriaPosicionesLibres.size();
+	mensajeLog << "Contenido array: ";
+
+	for(a=0;a<tam;a++){
+		mensajeLog << this->vectorMemoriaPosicionesLibres[a] << "-";
+	}
+	mensajeLog << endl;
+	Log::getInstance()->loguear(mensajeLog.str());
 
 }
 
