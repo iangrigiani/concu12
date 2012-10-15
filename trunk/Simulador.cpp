@@ -53,7 +53,7 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 			this->vectorMemoriaPosiciones.push_back(memoria);
 
 			//Creo un semaforo por cada posicion inicializada
-			Semaforo semaforo((char*)ARCHIVO_SEMAFORO_POSICIONES, 1, (char) i);
+			Semaforo semaforo((char*)nombreArchivo.str().c_str(), 1, (char) i);
 			this->semaforos.push_back(semaforo);
 		}
 		else
