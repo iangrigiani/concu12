@@ -7,25 +7,32 @@ using namespace std;
 
 
 void informarParametrosInvalidos(enum ParametrosInvalidos error) {
-        switch (error) {
-                case CANTIDAD_INVALIDA: {
-                        Log::getInstance()->loguear("La cantidad de parametros es invalida.");
-                        break;
-                }
-                case LUGARES_DISPONIBLES_INVALIDO: {
-                        Log::getInstance()->loguear("La cantidad de lugares disponibles ingresados es invalida. Debe ser mayor a 0.");
-                        break;
-                }
-                case COSTO_HORA_INVALIDO: {
-                        Log::getInstance()->loguear("El costo por hora ingresado es invalido. Debe ser mayor a 0.");
-                        break;
-                }
+	string mensaje;
+	switch (error) {
+		case CANTIDAD_INVALIDA: {
+			mensaje = "La cantidad de parametros es invalida.";
+			Log::getInstance()->loguear(mensaje);
+			break;
+		}
+		case LUGARES_DISPONIBLES_INVALIDO: {
+			mensaje = "La cantidad de lugares disponibles ingresados es invalida. Debe ser mayor a 0.";
+			Log::getInstance()->loguear(mensaje);
+			break;
+		}
+		case COSTO_HORA_INVALIDO: {
+			mensaje = "El costo por hora ingresado es invalido. Debe ser mayor a 0.";
 
-                case TIEMPO_INVALIDO: {
-                        Log::getInstance()->loguear("La duracion de la simulación ingresada es invalida. Debe ser mayor a 0.");
-                        break;
-                }
-        }
+			Log::getInstance()->loguear(mensaje);
+			break;
+		}
+
+		case TIEMPO_INVALIDO: {
+			mensaje = "La duracion de la simulación ingresada es invalida. Debe ser mayor a 0.";
+			Log::getInstance()->loguear(mensaje);
+			break;
+		}
+	}
+	cerr << mensaje << endl;
 }
 
 

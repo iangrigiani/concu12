@@ -20,8 +20,8 @@ void Estacionamiento::crearArchivosTemporales(int cantidadLugares)
 {
 
 	int i;
-	FILE * tmpPosicion;
-	FILE * tmpAdministracion;
+	FILE * tmpFile;
+	stringstream mensaje;
 
 	for (i=0;i<cantidadLugares;i++)
 	{
@@ -32,8 +32,12 @@ void Estacionamiento::crearArchivosTemporales(int cantidadLugares)
 		nombreArchivo << i;
 		//cout << "nombre archivo: " << nombreArchivo.str() << endl;
 
-		tmpPosicion = fopen(nombreArchivo.str().c_str(),"w");
-		fclose(tmpPosicion);
+		tmpFile = fopen(nombreArchivo.str().c_str(),"w");
+
+		mensaje.str("");
+		mensaje << "Creo el archivo temporal: " << nombreArchivo.str();
+		Log::getInstance()->loguear(mensaje.str());
+		fclose(tmpFile);
 
 
 		nombreArchivo.flush();
@@ -44,30 +48,52 @@ void Estacionamiento::crearArchivosTemporales(int cantidadLugares)
 	stringstream archivoAdministracion;
 	archivoAdministracion << ARCHIVO_ADMINISTRACION;
 
+	tmpFile = fopen(archivoAdministracion.str().c_str(),"w");
+	fclose(tmpFile);
 
-	tmpAdministracion = fopen(archivoAdministracion.str().c_str(),"w");
-	fclose(tmpAdministracion);
+	mensaje.str("");
+	mensaje << "Creo el archivo temporal: " << archivoAdministracion.str();
+	Log::getInstance()->loguear(mensaje.str());
 
+	// Creo archivos temporales para semaforos
+	stringstream archivoSmfAdministracion;
+	archivoSmfAdministracion << ARCHIVO_SEMAFORO_ADMINISTRACION;
+
+	tmpFile = fopen(archivoSmfAdministracion.str().c_str(),"w");
+	fclose(tmpFile);
+
+	mensaje.str("");
+	mensaje << "Creo el archivo temporal: " << archivoSmfAdministracion.str();
+	Log::getInstance()->loguear(mensaje.str());
+
+	stringstream archivoSmfPosiciones;
+	archivoSmfPosiciones << ARCHIVO_SEMAFORO_POSICIONES;
+
+	tmpFile = fopen(archivoSmfPosiciones.str().c_str(),"w");
+	fclose(tmpFile);
+
+	mensaje.str("");
+	mensaje << "Creo el archivo temporal: " << archivoSmfPosiciones.str();
+	Log::getInstance()->loguear(mensaje.str());
 }
 
 void Estacionamiento::eliminarArchivosTemporales(int cantidadLugares)
 {
 	int i;
 
+	stringstream mensaje;
 	for (i=0;i<cantidadLugares;i++)
 	{
 		stringstream nombreArchivo;
-		stringstream nombreArchivoLibres;
 
 		// Destruyo archivo temporal posiciones
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
 
-
 		remove(nombreArchivo.str().c_str());
-
-		remove(nombreArchivoLibres.str().c_str());
-
+		mensaje.str("");
+		mensaje << "Destruyo el archivo temporal: " << nombreArchivo.str();
+		Log::getInstance()->loguear(mensaje.str());
 
 		nombreArchivo.flush();
 
@@ -78,7 +104,29 @@ void Estacionamiento::eliminarArchivosTemporales(int cantidadLugares)
 	archivoAdministracion << ARCHIVO_ADMINISTRACION;
 
 	remove(archivoAdministracion.str().c_str());
+	mensaje.str("");
+	mensaje << "Destruyo el archivo temporal: " << archivoAdministracion.str();
+	Log::getInstance()->loguear(mensaje.str());
+
+	// Destruyo archivos temporales de semaforos
+	stringstream archivoSmfAdministracion;
+	archivoSmfAdministracion << ARCHIVO_SEMAFORO_ADMINISTRACION;
+
+	remove(archivoSmfAdministracion.str().c_str());
+	mensaje.str("");
+	mensaje << "Destruyo el archivo temporal: " << archivoSmfAdministracion.str();
+	Log::getInstance()->loguear(mensaje.str());
+
+	stringstream archivoSmfPosiciones;
+	archivoSmfPosiciones << ARCHIVO_SEMAFORO_POSICIONES;
+
+	remove(archivoSmfPosiciones.str().c_str());
+	mensaje.str("");
+	mensaje << "Destruyo el archivo temporal: " << archivoSmfPosiciones.str();
+	Log::getInstance()->loguear(mensaje.str());
 }
+
+
 
 
 
@@ -137,14 +185,12 @@ void Estacionamiento::crearVectorPosicionesLibres(int cantidadLugares)
 		stringstream mensajeLog;
 
 		mensajeLog << "Escribo el numero " << i <<" en el vector de posiciones libres.";
-
 		Log::getInstance()->loguear(mensajeLog.str());
 
 		this->vectorMemoriaPosicionesLibres.push_back(i);
 
 		mensajeLog.flush();
 	}
-
 }
 
 void Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
@@ -156,7 +202,6 @@ void Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
 
 	administracion.setCostoHora(costoHora);
 
-
 	// Creo archivo temporal
 	nombreArchivo << ARCHIVO_ADMINISTRACION;
 
@@ -166,7 +211,6 @@ void Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
 	if(estadoMemoria == SHM_OK)
 	{
 		mensajeLog << "Memoria Compartida : escribo el costo hora del estacionamiento costo hora = " << administracion.getCostoHora();
-
 		Log::getInstance()->loguear(mensajeLog.str());
 
 		this->administracion.escribir(administracion);
@@ -175,12 +219,7 @@ void Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
 	{
 		mensajeLog<<"Error al inicializar la administracion de memoria compartida en el estacionamiento";
 		Log::getInstance()->loguear(mensajeLog.str());
-
-
 	}
-
-
-
 }
 
 
@@ -197,7 +236,6 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 		recibido[q] = 0;
 	}
 
-
 	//Inicializa el tiempo en el cronometro y arranca el tiempo a correr en la simulacion
 	Cronometro::obtenerCronometro()->setTiempoASimular(tiempoEjecucion);
 	Cronometro::obtenerCronometro()->iniciarTiempo();
@@ -207,15 +245,9 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 
 	if( this->pConsola != 0)
 	{
-
-		stringstream mensajeLog;
-
-		mensajeLog << "Soy el proceso principal";
-
-		Log::getInstance()->loguear(mensajeLog.str());
+		Log::getInstance()->loguear("Soy el proceso principal");
 
 		this->crearIniciales(cantidadDeLugares, costoHora);
-
 
 		//Proceso padre
 		this->pEntrada1 = fork();
@@ -223,9 +255,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 		if( this->pEntrada1 == 0)
 		{
 			//Proceso entrada 1
-			stringstream mensajeLog;
-			mensajeLog << "Soy el proceso entrada 1";
-			Log::getInstance()->loguear(mensajeLog.str());
+			Log::getInstance()->loguear("Soy el proceso entrada 1");
 
 			correrSimuladorEntrada(1,this->pipeEntrada1,cantidadDeLugares);
 		}
@@ -237,9 +267,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 			if( this->pEntrada2 == 0)
 			{
 				//Proceso entrada 2
-				stringstream mensajeLog;
-				mensajeLog << "Soy el proceso entrada 2";
-				Log::getInstance()->loguear(mensajeLog.str());
+				Log::getInstance()->loguear("Soy el proceso entrada 2");
 
 				correrSimuladorEntrada(2,this->pipeEntrada2,cantidadDeLugares);
 			}
@@ -251,9 +279,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 				if( this->pEntrada3 == 0)
 				{
 					//Proceso entrada 3
-					stringstream mensajeLog;
-					mensajeLog << "Soy el proceso entrada 3";
-					Log::getInstance()->loguear(mensajeLog.str());
+					Log::getInstance()->loguear("Soy el proceso entrada 3");
 
 					correrSimuladorEntrada(3,this->pipeEntrada3,cantidadDeLugares);
 				}
@@ -264,9 +290,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 					if (this->pSalida1 == 0)
 					{
 						//Proceso salida 1
-						stringstream mensajeLog;
-						mensajeLog<<"Soy el proceso salida 1";
-						Log::getInstance()->loguear(mensajeLog.str());
+						Log::getInstance()->loguear("Soy el proceso salida 1");
 
 						correrSimuladorSalida(1,this->pipeSalida1,cantidadDeLugares);
 					}
@@ -277,9 +301,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 						if(this->pSalida2 == 0)
 						{
 							//Proceso salida 2
-							stringstream mensajeLog;
-							mensajeLog<<"Soy el proceso salida 2";
-							Log::getInstance()->loguear(mensajeLog.str());
+							Log::getInstance()->loguear("Soy el proceso salida 2");
 
 							correrSimuladorSalida(2,this->pipeSalida2,cantidadDeLugares);
 
@@ -287,51 +309,52 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 						else
 						{
 							// Proceso principal (funciona como servidor de mensajes)
-							stringstream mensajeLog;
-							mensajeLog << "Soy el proceso principal funcionando como servidor de mensajes.";
-							Log::getInstance()->loguear(mensajeLog.str());
+							Log::getInstance()->loguear("Soy el proceso principal funcionando como servidor de mensajes.");
 
 							bool salir = false;
-
 							int cantidadTotalEntradas = 0;
 
 							while (!salir)
 							{
-								//cout << "PPAL: ARRANCO EL WHILE CON ESTA MIERDA EN EL RECIBIDO: " << recibido << endl;
 								int bytes = this->pipePpal.leer((char*)recibido, BUFFSIZE);
 
+								// Me aseguro que solo se procesen los bytes recibidos y no la posible basura existente en el array
 								string stringRecibido(recibido);
 								stringRecibido = stringRecibido.substr(0, bytes);
 
-								//cout << "ProcPrincipal: acabo de recibir " << bytes << " bytes: " << str << endl;
 								string token;
 								stringstream stream(stringRecibido);
 								while( getline(stream, token, '?') ) {
 
 									char * recibidoParcial = (char*)token.c_str();
 
-									//cout << "ProcPrincipal: acabo de recibir: " << word << endl;
+									stringstream mensaje;
+									mensaje << "ProcPrincipal: acabo de recibir: " << recibidoParcial;
+									Log::getInstance()->loguear(mensaje.str());
 
 									stringstream retorno;
 
 									switch (recibidoParcial[0])
 									{
 										case 'a': {
-											cout << "Ingreso una a" << endl;
+											Log::getInstance()->loguear("Ingreso una 'a' por consola");
+
 											int cantidad = this->obtenerCantidadActualDeAutos();
 											retorno << "La cantidad actual de autos es : "<< cantidad;
 											this->pipeConsola.escribir((char*)retorno.str().c_str(),retorno.str().length());
 											break;
 										}
 										case 'm': {
-											cout << "Ingreso una m" << endl;
+											Log::getInstance()->loguear("Ingreso una 'm' por consola");
+
 											float monto = this->obtenerMontoRecaudado();
 											retorno << "El monto recaudado hasta el momento es : "<<monto;
 											this->pipeConsola.escribir((char*)retorno.str().c_str(),retorno.str().length());
 											break;
 										}
 										case 'q': {
-											cout << "Ingreso un q" << endl;
+											Log::getInstance()->loguear("Ingreso una 'q' por consola");
+
 											salir = true;
 											this->pipeConsola.cerrar();
 											break;
@@ -339,7 +362,11 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 										case 'p': {
 											char * token = strtok(recibidoParcial, "|");
 											token = strtok(NULL, "|");
-											cout << "Saco del vector de posiciones libres la posicion: " << token << endl;
+
+											mensaje.str("");
+											mensaje << "Saco del vector de posiciones libres la posicion: " << token;
+											Log::getInstance()->loguear(mensaje.str());
+
 											int pos = atoi(token);
 											this->quitarPosicionLibre(pos);
 											break;
@@ -347,7 +374,11 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 										case 'd': {
 											char * token = strtok(recibidoParcial, "|");
 											token = strtok(NULL, "|");
-											cout << "Agrego al  vector de posiciones libres la posicion: " << token << endl;
+
+											mensaje.str("");
+											mensaje << "Agrego al  vector de posiciones libres la posicion: " << token;
+											Log::getInstance()->loguear(mensaje.str());
+
 											int pos = atoi(token);
 											this->agregarPosicionLibre(pos);
 											break;
@@ -357,16 +388,16 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 											token = strtok(NULL, "|");
 											int pos = atoi(token);
 											int numeroSalida = this->getSalidaAleatoria();
-											cout << "Auto sale del estacionamiento por la salida "<<numeroSalida<<" y deja la posicion " << pos << endl;
-											retorno<<"s|";
-											retorno<<pos;
+
+											mensaje.str("");
+											mensaje << "Auto sale del estacionamiento por la salida " << numeroSalida << " y deja la posicion " << pos;
+											Log::getInstance()->loguear(mensaje.str());
+
+											retorno << "s|" << pos;
 											if(numeroSalida == 1){
 												this->pipeSalida1.escribir((char*)retorno.str().c_str(),retorno.str().length());
-											}
-											else
-											{
+											} else {
 												this->pipeSalida2.escribir((char*)retorno.str().c_str(),retorno.str().length());
-
 											}
 											break;
 										}
@@ -377,7 +408,9 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 
 												cantidadTotalEntradas+=numeroEntrada;
 
-												cout<<"La cantidad total es "<<cantidadTotalEntradas<<endl;
+												mensaje.str("");
+												mensaje << "La suma del numero de entradas total es " << cantidadTotalEntradas;
+												Log::getInstance()->loguear(mensaje.str());
 
 												if(cantidadTotalEntradas == CANTIDAD_TOTAL_ENTRADAS)
 												{
@@ -391,9 +424,12 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 										}
 										default: {
 											if ( recibidoParcial[0] > '0' && recibidoParcial[0] < '4') {
-												int nroPosicion;
-												nroPosicion = this->getPosicionAleatoria();
-												cout << "Entrada " << recibidoParcial[0] << " pide una posicion, le envio: " << nroPosicion << endl;
+												int nroPosicion = this->getPosicionAleatoria();
+
+												mensaje.str("");
+												mensaje << "Entrada " << recibidoParcial[0] << " pide una posicion, le envio: " << nroPosicion;
+												Log::getInstance()->loguear(mensaje.str());
+
 												retorno << nroPosicion;
 												if (recibidoParcial[0] == '1'){
 													this->pipeEntrada1.escribir((char*)retorno.str().c_str(),retorno.str().length());
@@ -405,7 +441,9 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 													}
 												}
 											} else {
-												cout << "Comando invalido" << endl;
+												cout << "Comando invalido! Ingrese 'a' para ver la cantidad de autos estacionados, ";
+												cout << "'m' para conocer el monto recaudado ";
+												cout << " o 'q' para finalizar el programa" << endl;
 											}
 											break;
 										}
@@ -413,20 +451,21 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 								}
 							}
 
-							cout << endl << "Acordate de ingresar Q por teclado pq sino esto no muere mas!! " << endl;
-							cout << "Pconsola es...: " << pConsola << endl;
-
 							finalizarProcesos();
 
 							this->liberarMemoriaCompartida(cantidadDeLugares);
 
 							finalizarPipes();
 
-							cout << "Terminado proceso..." << pConsola << endl;
+							stringstream mensajeFinalizacion;
+							mensajeFinalizacion.str("");
+							mensajeFinalizacion << "Terminado proceso: " << pConsola << " (consola)";
+							Log::getInstance()->loguear(mensajeFinalizacion.str());
+
 							cout << "FIN SIMULACION" << endl;
 
-							stringstream mensajeFinalizacion;
-							mensajeFinalizacion<<"FIN SIMULACION";
+							mensajeFinalizacion.str("");
+							mensajeFinalizacion << "FIN SIMULACION";
 							Log::getInstance()->loguear(mensajeFinalizacion.str());
 						}
 					}
@@ -445,7 +484,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 		bool salir = false;
 		// Para terminar el programa, el usuario debe escribir 'Q' o 'q'
 		while (!salir) {
-			cout << "ProcConsola: Me quedo esperando que ingreses algo por consola..." << endl;
+			cout << "Ingrese un comando: ";
 			cin.getline(recibido, 2);
 
 			stringstream ssRecibido;
@@ -463,7 +502,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 				int bytes = this->pipeConsola.leer(recibir, BUFFSIZE);
 				recibir[bytes] = '\0';
 
-				cout << "ProcConsola: acabo de recibir como rta: " << recibir << endl;
+				cout << recibir << endl;
 
 			} else {
 				salir = true;
@@ -472,9 +511,11 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 
 		this->pipeConsola.cerrar();
 		this->pipePpal.cerrar();
-		cout << "Me rajo antes que muera... soy: " << getpid() << endl;
-	}
 
+		mensajeLog.str("");
+		mensajeLog << "Termina el proceso: " << getpid() << " (consola)";
+		Log::getInstance()->loguear(mensajeLog.str());
+	}
 	Cronometro::destruir();
 }
 
