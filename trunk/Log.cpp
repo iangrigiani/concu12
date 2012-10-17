@@ -19,15 +19,16 @@ Log::Log()
 
 Log* Log::getInstance()
 {
-	if ( instance == NULL )
+	if ( instance == NULL ) {
 		instance = new Log();
+	}
 	return instance;
 }
 
 void Log::destruir ()
 {
 	if ( instance != NULL ) {
-		//Log::getInstance()->loguear("Log: destruido.");
+
 		delete ( instance );
 		instance = NULL;
 	}

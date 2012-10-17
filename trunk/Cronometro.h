@@ -10,7 +10,7 @@ class Cronometro {
 private:
 
 	int tiempoASimular;
-	Fecha * horaInicial;
+	Fecha horaInicial;
 	static Cronometro * cronometro;
 	Cronometro();
 

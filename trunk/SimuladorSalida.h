@@ -22,7 +22,7 @@ public:
 
 	int getNumeroSalida();
 
-
+	void liberarSemaforos();
 };
 
 #endif /* SIMULADORSALIDA_H_ */

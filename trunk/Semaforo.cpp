@@ -61,3 +61,7 @@ void Semaforo :: eliminar () {
 	semctl ( this->id,0,IPC_RMID );
 }
 
+
+int Semaforo::getId(){
+	return this->id;
+}
