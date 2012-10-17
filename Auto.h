@@ -2,6 +2,9 @@
 #define AUTO_H_
 
 #include <iostream>
+#include <sstream>
+#include "Log.h"
+
 using namespace std;
 
 class Auto

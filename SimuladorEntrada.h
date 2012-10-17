@@ -17,7 +17,7 @@ private:
 	void incrementarCantidadDeAutosEstacionamiento();
 	void incrementarMontoRecaudado(int horas);
 
-	int cantidadAutos;
+	int cantidadAutosCreados;
 
 	Semaforo semaforo;
 
