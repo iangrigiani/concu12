@@ -35,12 +35,3 @@ long Fecha::getTime()
 
 	 return time;
 }
-
-
-
-void Fecha::mostrarFechaActual(){
-
-	cout << "Hora " << this->hora<<":"<<this->minutos<<":"<<this->segundos<< " anio " <<this->anio<<endl;
-
-
-}

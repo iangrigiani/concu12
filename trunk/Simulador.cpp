@@ -57,7 +57,7 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 		}
 		else
 		{
-			mensajeLog<<"Error al inicializar el vector de memoria compartida en la posicion "<<i<<" en el simulador";
+			mensajeLog << "Error al inicializar el vector de memoria compartida en la posicion " << i << " en el simulador";
 			Log::getInstance()->loguear(mensajeLog.str());
 			mensajeLog.flush();
 
@@ -82,7 +82,7 @@ void Simulador::inicializarMemoriaCompartidaAdministracion()
 
 	if(estadoMemoria != SHM_OK)
 	{
-		mensajeLog<<"Error al inicializar la administracion de memoria compartida en el simulador";
+		mensajeLog << "Error al inicializar la administracion de memoria compartida en el simulador";
 		Log::getInstance()->loguear(mensajeLog.str());
 	}
 
