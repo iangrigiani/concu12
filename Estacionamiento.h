@@ -61,17 +61,18 @@ private:
 
 	void finalizarPipes();
 
-	void crearIniciales(int cantidadDeLugares, int costoHora);
+	bool crearIniciales(int cantidadDeLugares, int costoHora);
 
 	void crearArchivosTemporales(int cantidadLugares);
 
 	void eliminarArchivosTemporales(int cantidadLugares);
 
-	void crearMemoriaCompartidaPosiciones(int cantidadLugares);
+	// Devuelve false en caso de haber algun error en la creacion, sino true
+	bool crearMemoriaCompartidaPosiciones(int cantidadLugares);
 
 	void crearVectorPosicionesLibres(int cantidadLugares);
 
-	void crearMemoriaCompartidaAdministracion(float costoHora);
+	bool crearMemoriaCompartidaAdministracion(float costoHora);
 
 	void correrSimuladorEntrada(int numeroEntrada,Pipe pipeEntrada,int cantidadPosiciones);
 
@@ -89,7 +90,11 @@ private:
 
 	int insercionBinariaVectorLibres(int inicio,int fin,int buscado);
 
-	void liberarMemoriaCompartida(int cantidadLugares);
+	void liberarRecursos(int cantidadLugares);
+
+	void liberarMemoriaCompartidaPosiciones(int cantidadLugares);
+
+	void liberarMemoriaCompartidaAdministracion();
 
 	int obtenerCantidadActualDeAutos();
 

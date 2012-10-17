@@ -106,7 +106,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 					cout << "Soy el auto " << getpid() << " y la posicion que dejo es " << automovil.getNumeroPosicion() << endl;
 					mensajeLog.str("");
-					mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Soy el auto pid" << getpid() << " La posicion que dejo es " << automovil.getNumeroPosicion();
+					mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Soy el auto pid: " << getpid() << " La posicion que dejo es " << automovil.getNumeroPosicion();
 					Log::getInstance()->loguear(mensajeLog.str());
 
 					pipePpal.escribir((char*)salida.str().c_str(),salida.str().length());

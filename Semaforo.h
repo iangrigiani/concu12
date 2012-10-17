@@ -18,6 +18,8 @@ public:
 	Semaforo ( const char* nombre,int valorInicial,char id);
 	virtual ~Semaforo();
 
+	int getId();
+
 	int p (); // decrementa
 	int v (); // incrementa
 	void eliminar ();

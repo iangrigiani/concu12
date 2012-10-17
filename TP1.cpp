@@ -80,7 +80,7 @@ int validarParametros(int argc, char* argv[], Parametros* parametros){
 
 int main(int argc, char *argv[])
 {
-	 int retorno;
+	int retorno;
 
 	// Se loguea siempre
 	Log::getInstance()->setModoDebug( true );

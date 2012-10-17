@@ -13,20 +13,13 @@ Simulador::Simulador(int numero, int cantidadPosiciones)
 	Semaforo smfAdmin(ARCHIVO_SEMAFORO_ADMINISTRACION,1,'a');
 	this->smfAdministracion = smfAdmin;
 
+	stringstream mensajeLog;
+	mensajeLog << "Simulador - Creo semaforo id: " << this->smfAdministracion.getId() << " (admin)";
+	Log::getInstance()->loguear(mensajeLog.str());
 }
 
 Simulador::~Simulador()
 {
-	 // Elimino los semaforos
-	  vector<Semaforo>::iterator itSemaforos = this->semaforos.begin();
-		while(itSemaforos != this->semaforos.end()){
-				itSemaforos->eliminar();
-				itSemaforos++;
-		}
-
-		//Habria que eliminar administracion o como ya lo esta haciendo estacionamiento
-		// no hace falta??? Porque es el mismo semaforo
-
 }
 
 void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosiciones)
@@ -54,10 +47,14 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 			//Creo un semaforo por cada posicion inicializada
 			Semaforo semaforo((char*)nombreArchivo.str().c_str(), 1, (char) i);
 			this->semaforos.push_back(semaforo);
+
+			mensajeLog << "Creo semaforo id: " << semaforo.getId();
+			Log::getInstance()->loguear(mensajeLog.str());
+			mensajeLog.flush();
 		}
 		else
 		{
-			mensajeLog << "Error al inicializar el vector de memoria compartida en la posicion " << i << " en el simulador";
+			mensajeLog << "Simulador - Error al inicializar el vector de memoria compartida en la posicion " << i << " en el simulador";
 			Log::getInstance()->loguear(mensajeLog.str());
 			mensajeLog.flush();
 
@@ -66,7 +63,6 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 		nombreArchivo.flush();
 
 	}
-
 }
 
 void Simulador::inicializarMemoriaCompartidaAdministracion()
@@ -85,7 +81,6 @@ void Simulador::inicializarMemoriaCompartidaAdministracion()
 		mensajeLog << "Error al inicializar la administracion de memoria compartida en el simulador";
 		Log::getInstance()->loguear(mensajeLog.str());
 	}
-
 }
 
 

@@ -68,6 +68,7 @@ void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 		}
 	}
 
+	liberarSemaforos();
 	//cout << "Salida - " << this->getNumeroSalida() << " y numero proceso " << getpid() << " y muero ahora" << endl;
 	mensajeLog.str("");
 	mensajeLog << "Salida " << this->getNumeroSalida() << " - Numero proceso " << getpid() << " y muero ahora";
@@ -141,3 +142,21 @@ void SimuladorSalida::decrementarCantidadAutosEstacionamiento()
 	mensajeLog << "Salida " << this->getNumeroSalida() << " - Se registra la salida de un auto al estacionamiento habiendo en total: " << admin.getCantidadDeAutos();
 	Log::getInstance()->loguear(mensajeLog.str());
 }
+
+void SimuladorSalida::liberarSemaforos(){
+	 // Elimino los semaforos
+	vector<Semaforo>::iterator itSemaforos = this->semaforos.begin();
+	while(itSemaforos != this->semaforos.end()){
+
+		stringstream mensajeLog;
+
+		mensajeLog << "Salida " << this->getNumeroSalida() << " - Libero semaforo id: " << itSemaforos->getId();
+		Log::getInstance()->loguear(mensajeLog.str());
+
+		itSemaforos->eliminar();
+
+		itSemaforos++;
+	}
+}
+
+

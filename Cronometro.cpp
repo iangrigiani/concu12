@@ -3,12 +3,10 @@
 
 
 Cronometro::Cronometro() {
-	this->horaInicial = NULL;
 	this->tiempoASimular = 0;
 }
 
 Cronometro::~Cronometro() {
-	delete this->horaInicial;
 }
 
 int Cronometro::getTiempoASimular(){
@@ -34,7 +32,8 @@ Cronometro * Cronometro::obtenerCronometro(){
  */
  void Cronometro::iniciarTiempo(){
 
-	 this->horaInicial = new Fecha();
+	 Fecha fechaInicial;
+	 this->horaInicial = fechaInicial;
   }
 
 /**
@@ -43,11 +42,9 @@ Cronometro * Cronometro::obtenerCronometro(){
  */
 double Cronometro::getFlujoDeAutos(){
 
-	Fecha * fechaActual = new Fecha();
+	Fecha fechaActual;
 
-	double x = ((fechaActual->getTime())-(this->horaInicial->getTime()))/ 1000.0;
-
-	delete fechaActual;
+	double x = ((fechaActual.getTime())-(this->horaInicial.getTime()))/ 1000.0;
 
 	return (90000.0-(x-300)*(x-300))/90000.0;
 }
@@ -59,13 +56,12 @@ double Cronometro::getFlujoDeAutos(){
 bool Cronometro::llegoAlFinal() {
 
 	bool retorno = false;
-	Fecha * fechaActual = new Fecha();
-	double x = ((fechaActual->getTime())-(this->horaInicial->getTime()))/ 1000.0;
 
-	delete fechaActual;
+	Fecha fechaActual;
+	double x = ((fechaActual.getTime())-(this->horaInicial.getTime()))/ 1000.0;
+
 	if(x>this->tiempoASimular)
 		retorno = true;
-
 
 	return retorno;
 }
@@ -77,7 +73,3 @@ void Cronometro::destruir ()
 		cronometro = NULL;
 	}
 }
-
-
-
-
