@@ -18,6 +18,7 @@ public:
 
 	virtual ~Cronometro();
 
+	// Devuelve la instancia del cronometro (singleton)
 	static Cronometro * obtenerCronometro();
 
 	void iniciarTiempo();

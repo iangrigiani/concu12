@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 {
 	int retorno;
 
-	// Se loguea siempre
+	// Seteo el modo debug
 	Log::getInstance()->setModoDebug( true );
 
 	Parametros parametros;

@@ -22,6 +22,7 @@ public:
 
 	int getNumeroSalida();
 
+	// Se encarga de liberar los semaforos de la memoria compartida de posiciones
 	void liberarSemaforos();
 };
 
