@@ -646,7 +646,6 @@ int Estacionamiento::busquedaBinariaVectorLibres(int inicio,int fin,int buscado)
 }
 
 
-
 void Estacionamiento::agregarPosicionLibre(int numeroPosicion)
 {
 	stringstream mensajeLog;

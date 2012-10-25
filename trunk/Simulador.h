@@ -26,11 +26,15 @@ class Simulador {
 
 private:
 
+	// Crea las memorias compartidas para las posiciones del estacionamiento
 	void inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosiciones);
+
+	// Crea la memoria compartida para la administracion
 	void inicializarMemoriaCompartidaAdministracion();
 
 protected:
 
+	// Vector donde guardo las memorias compartidas
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
 	MemoriaCompartida<Administracion> administracion;
 
@@ -42,6 +46,7 @@ protected:
 
     int numero;
 
+    // Devuelve la cantidad de autos almacenados en la memoria compartida de la administracion
 	int getCantidadAutosEstacionamiento();
 
 

@@ -94,8 +94,6 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 
 					this->incrementarMontoRecaudado(horas);
 
-					//this->cantidadAutos--;
-
 					//Pipe al principal para que le avise que tiene que sacar el auto
 					//del estacionamiento y agregar la posicion nuevamente en la lista de posiciones libres
 					stringstream salida;
@@ -137,7 +135,6 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 				while (!cicloCompleto)
 				{
 
-					//Agregar semaforo para sincronizar el acceso
 					//Pido una ubicacion libre al servidor
 					pipePpal.escribir((char*)nroEntrada.str().c_str(),nroEntrada.str().length());
 

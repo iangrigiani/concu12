@@ -27,13 +27,12 @@ class Auto
 
 			int getHorasEstadia();
 
-
 			int getNumeroPosicion();
 
 			void setNumeroPosicion(int numero);
 
+			// Mantiene al auto dormido la cantidad de horas necesarias para la simulacion
 			void run();
-
 };
 
 
