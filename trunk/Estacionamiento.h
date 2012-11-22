@@ -74,12 +74,6 @@ private:
 	// Elimina los archivos temporales creados
 	void eliminarArchivosTemporales(int cantidadLugares);
 
-	// Crea las posiciones de memoria compartida segun la cantidad de lugares pasada por parametro
-	// En caso de haber algun error libera la memoria creada y devuelve false
-	bool crearMemoriaCompartidaPosiciones(int cantidadLugares);
-
-	// Crea en el stack el vector donde almaceno las memorias creadas
-	void crearVectorPosicionesLibres(int cantidadLugares);
 
 	// Crea la memoria compartida para la administracion
 	// En caso de error devuelve false
@@ -91,20 +85,8 @@ private:
 	// Metodo que llama al simulador de la salida y libera el pipe de comunicacion
 	void correrSimuladorSalida(int numeroSalida, Pipe pipeSalida, int cantidadPosiciones);
 
-	// Devuelve una posicion aleatoria del vector de posiciones libres. En caso de no haber ninguna devuelve -1
-	int getPosicionAleatoria();
-
 	// Devuelve un numero random entre 1 y 2 (numeros de salidas)
 	int getSalidaAleatoria();
-
-	// Elimina del vector de posiciones libres la posicion pasada por parametro
-	void quitarPosicionLibre(int numeroPosicion);
-
-	// Agrega de manera ordenada al vector de posiciones libres la posicion pasada por parametro
-	void agregarPosicionLibre(int numeroPosicion);
-
-	// Realiza una busqueda binaria recursiva de la posicion buscada. Devuelve el indice de la posicion o -1 si no la encuentra
-	int busquedaBinariaVectorLibres(int inicio,int fin,int buscado);
 
 	// Se encarga de llamar a los metodos para liberar memoria compartida, archivos temporales y el semaforo de la administracion
 	void liberarRecursos(int cantidadLugares);
