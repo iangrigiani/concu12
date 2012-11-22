@@ -1,4 +1,4 @@
-#include "Estacionamiento.h"
+#include "AdministradorGeneral.h"
 #include "Log.h"
 #include "Estructuras.h"
 
@@ -31,6 +31,11 @@ void informarParametrosInvalidos(enum ParametrosInvalidos error) {
 			Log::getInstance()->loguear(mensaje);
 			break;
 		}
+		case CANTIDAD_ESTACIONAMIENTOS: {
+			mensaje = "La cantida de estacionamientos debe ser mayor a 0 .";
+			Log::getInstance()->loguear(mensaje);
+			break;
+		}
 	}
 	cerr << mensaje << endl;
 }
@@ -42,9 +47,9 @@ int validarParametros(int argc, char* argv[], Parametros* parametros){
 
         int retorno = 0;
 
-        if (argc != 4) {
+        if (argc != 5) {
                 cerr << "Parametros invalidos" << endl;
-                cerr << "Uso: " << argv[0] << " [Lugares Disponibles] [Costo Hora] [Tiempo]" << endl;
+                cerr << "Uso: " << argv[0] << " [Lugares Disponibles] [Costo Hora] [Tiempo] [Cantidad Estacionamiento]" << endl;
                 informarParametrosInvalidos(CANTIDAD_INVALIDA);
                 retorno = -1;
         }
@@ -71,6 +76,13 @@ int validarParametros(int argc, char* argv[], Parametros* parametros){
                         informarParametrosInvalidos(TIEMPO_INVALIDO);
                         retorno = -1;
                 }
+
+               c = atoi(argv[i++]);
+			   if (c > 0) parametros->cantidadEstacionamientos = c;
+			   else {
+					   informarParametrosInvalidos(CANTIDAD_ESTACIONAMIENTOS);
+					   retorno = -1;
+			   }
         }
 
         return retorno;
@@ -92,9 +104,9 @@ int main(int argc, char *argv[])
 	{
 			Log::getInstance()->loguear( string ( argv[ 0 ] ) + " " + getStringParametros( &parametros ) );
 
-			Estacionamiento estacionamiento;
+			AdministradorGeneral administradorGeneral;
 
-			estacionamiento.run(parametros.lugaresDisponibles,parametros.costoHora,parametros.tiempoSimulacion);
+			administradorGeneral.run(parametros.lugaresDisponibles,parametros.costoHora,parametros.tiempoSimulacion,parametros.cantidadEstacionamientos);
 
 	}
 
