@@ -17,6 +17,11 @@ private:
 
 		void crearArchivosTemporales(int cantidadLugares,int numeroEstacionamiento);
 
+		void liberarRecursos(int cantidadEstacionamientos,int cantidadLugares);
+
+		void liberarMemoriaCompartidaEstacionamiento(int numeroEstacionamiento,int cantidadLugares);
+
+		void eliminarArchivosTemporales(int numeroEstacionamiento, int cantidadLugares);
 
 public:
 

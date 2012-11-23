@@ -24,21 +24,27 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 
 	if( this->pConsola != 0)
 	{
-		Log::getInstance()->loguear("Soy el proceso principal");
+		Log::getInstance()->loguear("Soy el proceso principal - el Administrador General");
 
 		for(int i=0;i<cantidadEstacionamientos;i++)
 		{
 			pid_t pEstacionamiento = fork();
 
+			//TODO ver si tenemos una lista de pipes, uno por cada estacionamiento que se
+			//crea para comunicarse con el administrador general
+
 			if(pEstacionamiento == 0)
 			{
-				Estacionamiento estacionamiento;
-				//TODO llamar al run del estacionamiento
+				Estacionamiento estacionamiento(i);
+				estacionamiento.run(cantidadDeLugares,costoHora,tiempoEjecucion);
+				exit(0);
 			}
 		}
 
 		//Soy el proceso administrador general
 		//TODA LA LOGICA DEL ADMINISTRADOR GENERAL, servidor de mensajes
+
+		liberarRecursos(cantidadEstacionamientos,cantidadDeLugares);
 
 	}
 	else
@@ -94,6 +100,8 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 		*/
 	}
 
+	//TODO finalizar procesos, debe esperar a que finalicen los procesos de los estacionamientos
+
 	Cronometro::destruir();
 
 }
@@ -130,7 +138,7 @@ void AdministradorGeneral::crearArchivosTemporales(int cantidadLugares, int nume
 		// Creo archivo temporal posiciones
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
-		nombreArchivo<<"Estacionamiento";
+		nombreArchivo<<ESTACIONAMIENTO;
 		nombreArchivo<<numeroEstacionamiento;
 
 		tmpFile = fopen(nombreArchivo.str().c_str(),"w");
@@ -146,7 +154,7 @@ void AdministradorGeneral::crearArchivosTemporales(int cantidadLugares, int nume
 
 	stringstream archivoSmfPosiciones;
 	archivoSmfPosiciones << ARCHIVO_SEMAFORO_POSICIONES;
-	archivoSmfPosiciones<<"Estacionamiento";
+	archivoSmfPosiciones<<ESTACIONAMIENTO;
 	archivoSmfPosiciones<<numeroEstacionamiento;
 
 	tmpFile = fopen(archivoSmfPosiciones.str().c_str(),"w");
@@ -155,6 +163,63 @@ void AdministradorGeneral::crearArchivosTemporales(int cantidadLugares, int nume
 	mensaje.str("");
 	mensaje << "Creo el archivo temporal: " << archivoSmfPosiciones.str();
 	Log::getInstance()->loguear(mensaje.str());
+
+}
+
+void AdministradorGeneral::liberarMemoriaCompartidaEstacionamiento(int numeroEstacionamiento,int cantidadLugares)
+{
+	Lugares lugar = this->lugares[numeroEstacionamiento];
+	lugar.liberarMemoriaCompartidaPosiciones(cantidadLugares);
+
+}
+
+void AdministradorGeneral::eliminarArchivosTemporales(int numeroEstacionamiento,int cantidadLugares)
+{
+	stringstream mensaje;
+	int i;
+	for (i=0;i<cantidadLugares;i++)
+	{
+		stringstream nombreArchivo;
+
+		// Destruyo archivo temporal posiciones
+		nombreArchivo << ARCHIVO_POSICIONES;
+		nombreArchivo << i;
+		nombreArchivo<<ESTACIONAMIENTO;
+		nombreArchivo<<numeroEstacionamiento;
+
+		remove(nombreArchivo.str().c_str());
+		mensaje.str("");
+		mensaje << "Destruyo el archivo temporal: " << nombreArchivo.str();
+		Log::getInstance()->loguear(mensaje.str());
+
+		nombreArchivo.flush();
+	}
+
+	stringstream archivoSmfPosiciones;
+	archivoSmfPosiciones << ARCHIVO_SEMAFORO_POSICIONES;
+	archivoSmfPosiciones<<ESTACIONAMIENTO;
+	archivoSmfPosiciones<<numeroEstacionamiento;
+
+	remove(archivoSmfPosiciones.str().c_str());
+	mensaje.str("");
+	mensaje << "Destruyo el archivo temporal: " << archivoSmfPosiciones.str();
+	Log::getInstance()->loguear(mensaje.str());
+
+}
+
+
+void AdministradorGeneral::liberarRecursos(int cantidadEstacionamientos,int cantidadLugares)
+{
+	int i;
+
+	for(i = 0; i<cantidadEstacionamientos;i++)
+	{
+		// Libero memoria compartida de posiciones
+		liberarMemoriaCompartidaEstacionamiento(i,cantidadLugares);
+
+		//Se eliminan los archivos temporales creados
+		eliminarArchivosTemporales(cantidadLugares,i);
+	}
 
 }
 

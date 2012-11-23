@@ -31,6 +31,8 @@ private:
 	vector<int> vectorMemoriaPosicionesLibres;
 	MemoriaCompartida<Administracion> administracion;
 
+	int numeroEstacionamiento;
+
 	// Pipe para la comunicacion de todas las entradas y la consola con el proceso principal. Todos escriben
 	// ahi y el proceso principal solo lee
 	Pipe pipePpal;
@@ -66,14 +68,13 @@ private:
 
 	// Metodo que gestiona la creacion de los archivos temporales y las memorias compartidas. En caso de no poder realizar alguna
 	// accion vuelve atras y devuelve false.
-	bool crearIniciales(int cantidadDeLugares, int costoHora);
+	bool crearIniciales(int costoHora);
 
-	// Crea los archivos temporales para la creacion de la memoria y los semaforos
-	void crearArchivosTemporales(int cantidadLugares);
+	// Crea los archivos temporales para la creacion de la memoria y semaforo de administracion
+	void crearArchivoTemporalAdministracion();
 
 	// Elimina los archivos temporales creados
-	void eliminarArchivosTemporales(int cantidadLugares);
-
+	void eliminarArchivoTemporalAdministracion();
 
 	// Crea la memoria compartida para la administracion
 	// En caso de error devuelve false
@@ -89,7 +90,7 @@ private:
 	int getSalidaAleatoria();
 
 	// Se encarga de llamar a los metodos para liberar memoria compartida, archivos temporales y el semaforo de la administracion
-	void liberarRecursos(int cantidadLugares);
+	void liberarRecursos();
 
 	// Libera la cantidad de memorias compartidas pasadas por parametros
 	void liberarMemoriaCompartidaPosiciones(int cantidadLugares);
@@ -107,7 +108,7 @@ private:
 
 public:
 
-	Estacionamiento();
+	Estacionamiento(int numero);
 
 	virtual ~Estacionamiento();
 
@@ -115,7 +116,6 @@ public:
 	// metodos para simular las entradas y salidas. Tambien se encarga de la comunicacion entre las entradas, salidas y la consola.
 	// Luego de terminada la ejecucion llama a los metodos para liberar los recursos.
 	void run(int cantidadDeLugares, float costoHora, int tiempoEjecucion);
-
 
 };
 

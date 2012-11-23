@@ -25,7 +25,7 @@ private:
 
 public:
 
-	SimuladorEntrada(int numeroEntrada,int cantidadPosiciones);
+	SimuladorEntrada(int numeroEstacionamiento,int numeroEntrada,int cantidadPosiciones);
 
 	virtual ~SimuladorEntrada() {};
 

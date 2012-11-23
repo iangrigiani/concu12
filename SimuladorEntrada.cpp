@@ -2,7 +2,7 @@
 #include "SimuladorEntrada.h"
 
 
-SimuladorEntrada::SimuladorEntrada(int numeroEntrada,int cantidadPosiciones) : Simulador (numeroEntrada,cantidadPosiciones)
+SimuladorEntrada::SimuladorEntrada(int numeroEstacionamiento,int numeroEntrada,int cantidadPosiciones) : Simulador (numeroEntrada,cantidadPosiciones,numeroEstacionamiento)
 {
 	this->cantidadAutosCreados = 0;
 
