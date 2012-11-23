@@ -1,7 +1,7 @@
 
 #include "Simulador.h"
 
-Simulador::Simulador(int numero, int cantidadPosiciones)
+Simulador::Simulador(int numero, int cantidadPosiciones,int numeroEstacionamiento)
 {
 	//Asocian a la misma memoria compartida que crea el principal
 	inicializarMemoriaCompartidaVectorPosiciones(cantidadPosiciones);
@@ -9,8 +9,16 @@ Simulador::Simulador(int numero, int cantidadPosiciones)
 
 	this->numero = numero;
 
+	this->numeroEstacionamiento = numeroEstacionamiento;
 
-	Semaforo smfAdmin(ARCHIVO_SEMAFORO_ADMINISTRACION,1,'a');
+	stringstream archivoSmfAdministracion;
+
+	archivoSmfAdministracion << ARCHIVO_SEMAFORO_ADMINISTRACION;
+	archivoSmfAdministracion << ESTACIONAMIENTO;
+	archivoSmfAdministracion << this->numeroEstacionamiento;
+
+
+	Semaforo smfAdmin(archivoSmfAdministracion.str().c_str(),1,'a');
 	this->smfAdministracion = smfAdmin;
 
 	stringstream mensajeLog;
@@ -36,6 +44,8 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 		// Creo archivo temporal
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
+		nombreArchivo<<ESTACIONAMIENTO;
+		nombreArchivo<<this->numeroEstacionamiento;
 
 		// Creo la memoria asociada al archivo temporal
 		int estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
@@ -72,6 +82,8 @@ void Simulador::inicializarMemoriaCompartidaAdministracion()
 
 	// Creo archivo temporal
 	nombreArchivo << ARCHIVO_ADMINISTRACION;
+	nombreArchivo<<ESTACIONAMIENTO;
+	nombreArchivo<<this->numeroEstacionamiento;
 
 	// Hago el atach a  la memoria asociada al archivo temporal
 	int estadoMemoria = this->administracion.crear ( (char*)nombreArchivo.str().c_str(),'R' );

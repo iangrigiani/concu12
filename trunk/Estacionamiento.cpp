@@ -2,7 +2,9 @@
 
 
 
-Estacionamiento::Estacionamiento() {
+Estacionamiento::Estacionamiento(int numero) {
+	this->numeroEstacionamiento = numero;
+
 }
 
 
@@ -11,38 +13,17 @@ Estacionamiento::~Estacionamiento()
 }
 
 
-void Estacionamiento::crearArchivosTemporales(int cantidadLugares)
+void Estacionamiento::crearArchivoTemporalAdministracion()
 {
 
-	//int i;
 	FILE * tmpFile;
 	stringstream mensaje;
-
-	//Esto lo hace el administrador general ahora
-	/*for (i=0;i<cantidadLugares;i++)
-	{
-		stringstream nombreArchivo;
-
-		// Creo archivo temporal posiciones
-		nombreArchivo << ARCHIVO_POSICIONES;
-		nombreArchivo << i;
-		//cout << "nombre archivo: " << nombreArchivo.str() << endl;
-
-		tmpFile = fopen(nombreArchivo.str().c_str(),"w");
-
-		mensaje.str("");
-		mensaje << "Creo el archivo temporal: " << nombreArchivo.str();
-		Log::getInstance()->loguear(mensaje.str());
-		fclose(tmpFile);
-
-
-		nombreArchivo.flush();
-
-	}*/
 
 	// Creo archivo temporal administracion
 	stringstream archivoAdministracion;
 	archivoAdministracion << ARCHIVO_ADMINISTRACION;
+	archivoAdministracion<<ESTACIONAMIENTO;
+	archivoAdministracion<<this->numeroEstacionamiento;
 
 	tmpFile = fopen(archivoAdministracion.str().c_str(),"w");
 	fclose(tmpFile);
@@ -54,6 +35,8 @@ void Estacionamiento::crearArchivosTemporales(int cantidadLugares)
 	// Creo archivos temporales para semaforos
 	stringstream archivoSmfAdministracion;
 	archivoSmfAdministracion << ARCHIVO_SEMAFORO_ADMINISTRACION;
+	archivoSmfAdministracion << ESTACIONAMIENTO;
+	archivoSmfAdministracion << this->numeroEstacionamiento;
 
 	tmpFile = fopen(archivoSmfAdministracion.str().c_str(),"w");
 	fclose(tmpFile);
@@ -62,44 +45,18 @@ void Estacionamiento::crearArchivosTemporales(int cantidadLugares)
 	mensaje << "Creo el archivo temporal: " << archivoSmfAdministracion.str();
 	Log::getInstance()->loguear(mensaje.str());
 
-
-	//Esto lo hace el administrador general ahora
-	/*stringstream archivoSmfPosiciones;
-	archivoSmfPosiciones << ARCHIVO_SEMAFORO_POSICIONES;
-
-	tmpFile = fopen(archivoSmfPosiciones.str().c_str(),"w");
-	fclose(tmpFile);
-
-	mensaje.str("");
-	mensaje << "Creo el archivo temporal: " << archivoSmfPosiciones.str();
-	Log::getInstance()->loguear(mensaje.str());*/
 }
 
-void Estacionamiento::eliminarArchivosTemporales(int cantidadLugares)
+void Estacionamiento::eliminarArchivoTemporalAdministracion()
 {
-	int i;
 
 	stringstream mensaje;
-	for (i=0;i<cantidadLugares;i++)
-	{
-		stringstream nombreArchivo;
-
-		// Destruyo archivo temporal posiciones
-		nombreArchivo << ARCHIVO_POSICIONES;
-		nombreArchivo << i;
-
-		remove(nombreArchivo.str().c_str());
-		mensaje.str("");
-		mensaje << "Destruyo el archivo temporal: " << nombreArchivo.str();
-		Log::getInstance()->loguear(mensaje.str());
-
-		nombreArchivo.flush();
-
-	}
 
 	// Destruyo archivo temporal administracion
 	stringstream archivoAdministracion;
 	archivoAdministracion << ARCHIVO_ADMINISTRACION;
+	archivoAdministracion<<ESTACIONAMIENTO;
+	archivoAdministracion<<this->numeroEstacionamiento;
 
 	remove(archivoAdministracion.str().c_str());
 	mensaje.str("");
@@ -109,19 +66,14 @@ void Estacionamiento::eliminarArchivosTemporales(int cantidadLugares)
 	// Destruyo archivos temporales de semaforos
 	stringstream archivoSmfAdministracion;
 	archivoSmfAdministracion << ARCHIVO_SEMAFORO_ADMINISTRACION;
+	archivoSmfAdministracion << ESTACIONAMIENTO;
+	archivoSmfAdministracion << this->numeroEstacionamiento;
 
 	remove(archivoSmfAdministracion.str().c_str());
 	mensaje.str("");
 	mensaje << "Destruyo el archivo temporal: " << archivoSmfAdministracion.str();
 	Log::getInstance()->loguear(mensaje.str());
 
-	stringstream archivoSmfPosiciones;
-	archivoSmfPosiciones << ARCHIVO_SEMAFORO_POSICIONES;
-
-	remove(archivoSmfPosiciones.str().c_str());
-	mensaje.str("");
-	mensaje << "Destruyo el archivo temporal: " << archivoSmfPosiciones.str();
-	Log::getInstance()->loguear(mensaje.str());
 }
 
 
@@ -210,6 +162,8 @@ bool Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
 
 	// Creo archivo temporal
 	nombreArchivo << ARCHIVO_ADMINISTRACION;
+	nombreArchivo << ESTACIONAMIENTO;
+	nombreArchivo << this->numeroEstacionamiento;
 
 	// Creo la memoria asociada al archivo temporal
 	int estadoMemoria = this->administracion.crear ( (char*)nombreArchivo.str().c_str(),'R' );
@@ -237,7 +191,8 @@ bool Estacionamiento::crearMemoriaCompartidaAdministracion(float costoHora)
 void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjecucion)
 {
 	//Ver que hacer con las iniciales
-	bool creado = crearIniciales(cantidadDeLugares,costoHora);
+	bool creado = crearIniciales(costoHora);
+
 	if ( creado ){
 
 		// Genero un vector dinamico y lo inicializo para evitar los warning de compilador y de valgrind
@@ -430,9 +385,11 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 										}
 										default: {
 											if ( recibidoParcial[0] > '0' && recibidoParcial[0] < '4') {
+
 												//TODO ver como pedirle al padre la posicion aleatoria
 												//int nroPosicion = this->getPosicionAleatoria();
 												//TODO ver bien esto!!!
+
 												int nroPosicion = 0;
 
 												mensaje.str("");
@@ -462,7 +419,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 
 								finalizarProcesos();
 
-								liberarRecursos(cantidadDeLugares);
+								liberarRecursos();
 
 								finalizarPipes();
 							}
@@ -479,10 +436,17 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 
 
 
-bool Estacionamiento::crearIniciales(int cantidadDeLugares, int costoHora){
-	crearArchivosTemporales(cantidadDeLugares);
+bool Estacionamiento::crearIniciales(int costoHora){
 
-	Semaforo smfAdmin(ARCHIVO_SEMAFORO_ADMINISTRACION,1,'a');
+	crearArchivoTemporalAdministracion();
+
+	stringstream archivoSmfAdministracion;
+	archivoSmfAdministracion << ARCHIVO_SEMAFORO_ADMINISTRACION;
+	archivoSmfAdministracion << ESTACIONAMIENTO;
+	archivoSmfAdministracion << this->numeroEstacionamiento;
+
+
+	Semaforo smfAdmin(archivoSmfAdministracion.str().c_str(),1,'a');
 	this->smfAdministracion = smfAdmin;
 
 	stringstream mensajeLog;
@@ -490,14 +454,9 @@ bool Estacionamiento::crearIniciales(int cantidadDeLugares, int costoHora){
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	bool pudoCrear = false;
-	if ( crearMemoriaCompartidaAdministracion(costoHora) ){
-
-	/*	if ( crearMemoriaCompartidaPosiciones(cantidadDeLugares) ) {
-
-			crearVectorPosicionesLibres(cantidadDeLugares);*/
-		//TODO las memorias de posiciones ahora se crean en lugares
-			pudoCrear = true;
-		} else {
+	if ( crearMemoriaCompartidaAdministracion(costoHora) )
+		pudoCrear = true;
+	else {
 			liberarMemoriaCompartidaAdministracion();
 
 			// Elimino el semaforo de la administracion
@@ -513,7 +472,7 @@ bool Estacionamiento::crearIniciales(int cantidadDeLugares, int costoHora){
 
 void Estacionamiento::correrSimuladorEntrada(int numeroEntrada,Pipe pipeEntrada, int cantidadPosiciones)
 {
-	SimuladorEntrada simuladorEntrada(numeroEntrada,cantidadPosiciones);
+	SimuladorEntrada simuladorEntrada(this->numeroEstacionamiento,numeroEntrada,cantidadPosiciones);
 
 	simuladorEntrada.simular(pipeEntrada, this->pipePpal);
 
@@ -523,7 +482,7 @@ void Estacionamiento::correrSimuladorEntrada(int numeroEntrada,Pipe pipeEntrada,
 
 void Estacionamiento::correrSimuladorSalida(int numeroSalida,Pipe pipeSalida, int cantidadPosiciones)
 {
-	SimuladorSalida simuladorSalida(numeroSalida,cantidadPosiciones);
+	SimuladorSalida simuladorSalida(this->numeroEstacionamiento,numeroSalida,cantidadPosiciones);
 
 	simuladorSalida.simular(pipeSalida, this->pipePpal);
 
@@ -634,13 +593,13 @@ int Estacionamiento::obtenerCantidadActualDeAutos()
 	// Tomo el semaforo para lectura
 	this->smfAdministracion.p();
 
-	mensajeLog << "ProcPrincipal - Tome semaforo administracion";
+	mensajeLog << "Estacionamiento  "<<this->numeroEstacionamiento<< "  - Tome semaforo administracion";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	Administracion administracion = (Administracion)this->administracion.leer();
 
 	mensajeLog.str("");
-	mensajeLog << "ProcPrincipal - Libero semaforo administracion";
+	mensajeLog << "Estacionamiento  " <<this->numeroEstacionamiento <<" - Libero semaforo administracion";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	// Libero el semaforo
@@ -655,14 +614,14 @@ float Estacionamiento::obtenerMontoRecaudado()
 	// Tomo el semaforo para lectura
 	this->smfAdministracion.p();
 
-	mensajeLog << "ProcPrincipal - Tome semaforo administracion";
+	mensajeLog << "Estacionamiento  "<<this->numeroEstacionamiento<<"  - Tome semaforo administracion";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	//cout << "PPAL: Acabo de tomar el semaforo de admin " << endl;
 	Administracion administracion = (Administracion)this->administracion.leer();
 
 	mensajeLog.str("");
-	mensajeLog << "ProcPrincipal - Libero semaforo administracion";
+	mensajeLog << "Estacionamiento  "<<this->numeroEstacionamiento<<"  - Libero semaforo administracion";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	// Libero el semaforo
@@ -671,25 +630,24 @@ float Estacionamiento::obtenerMontoRecaudado()
 	return administracion.getImporteRecaudado();
 }
 
-void Estacionamiento::liberarRecursos(int cantidadLugares){
-
-	// Libero memoria compartida de posiciones
-	liberarMemoriaCompartidaPosiciones(cantidadLugares);
+void Estacionamiento::liberarRecursos(){
 
 	// Libero memoria compartida de administracion
 	liberarMemoriaCompartidaAdministracion();
 
 	//Se eliminan los archivos temporales creados
-	eliminarArchivosTemporales(cantidadLugares);
+	eliminarArchivoTemporalAdministracion();
 
 	// Elimino el semaforo de la administracion
 	stringstream mensajeLog;
-	mensajeLog << "ProcPrincipal - Libero semaforo id: " << this->smfAdministracion.getId() << " (admin)";
+	mensajeLog << "Estacionamiento " <<this->numeroEstacionamiento<<"  - Libero semaforo id: " << this->smfAdministracion.getId() << " (admin)";
 	Log::getInstance()->loguear(mensajeLog.str());
 	this->smfAdministracion.eliminar();
 }
 
-void Estacionamiento::liberarMemoriaCompartidaPosiciones(int cantidadLugares)
+
+//TODO esto ahora esta en administracion general
+/*void Estacionamiento::liberarMemoriaCompartidaPosiciones(int cantidadLugares)
 {
 	int i;
 
@@ -700,7 +658,7 @@ void Estacionamiento::liberarMemoriaCompartidaPosiciones(int cantidadLugares)
 		memoriaPosicion = this->vectorMemoriaPosiciones[i];
 		memoriaPosicion.liberar();
 	}
-}
+}*/
 
 void Estacionamiento::liberarMemoriaCompartidaAdministracion(){
 	//Se libera la memoria compartida correspondiente a la administracion.

@@ -25,7 +25,7 @@ bool Lugares::crearMemoriaCompartidaPosiciones(int cantidadLugares,int numeroEst
 		// Creo archivo temporal
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
-		nombreArchivo<<"Estacionamiento";
+		nombreArchivo<<ESTACIONAMIENTO;
 		nombreArchivo<<numeroEstacionamiento;
 
 		// Creo la memoria asociada al archivo temporal
@@ -45,11 +45,10 @@ bool Lugares::crearMemoriaCompartidaPosiciones(int cantidadLugares,int numeroEst
 		else
 		{
 			// Si hubo algun problema con la creacion de la memoria, se libera todo lo creado y se retorna false
-			mensajeLog << "Error al inicializar el vector de memoria compartida en la posicion " << i << " en el estacionamiento";
+			mensajeLog << "Error al inicializar el vector de memoria compartida en la posicion " << i << " en el estacionamiento" << numeroEstacionamiento;
 			Log::getInstance()->loguear(mensajeLog.str());
 
-			//TODO agregar liberacion memoria compartida
-			//liberarMemoriaCompartidaPosiciones(i);
+			liberarMemoriaCompartidaPosiciones(i);
 			retorno = false;
 			break;
 		}
@@ -90,7 +89,8 @@ void Lugares::quitarPosicionLibre(int numeroPosicion)
 
 	int posicionBuscada = busquedaBinariaVectorLibres(inicio,fin,numeroPosicion);
 
-	mensajeLog << "ProcPrincipal - Indice buscado =  " << posicionBuscada;
+
+	mensajeLog << "Estacionamiento - Indice buscado =  " << posicionBuscada;
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	this->vectorMemoriaPosicionesLibres.erase (this->vectorMemoriaPosicionesLibres.begin()+posicionBuscada);
@@ -98,7 +98,7 @@ void Lugares::quitarPosicionLibre(int numeroPosicion)
 	int a;
 
 	mensajeLog.str("");
-	mensajeLog << "ProcPrincipal - Contenido del array de posiciones libres: ";
+	mensajeLog<<"Estacionamiento - Contenido del array de posiciones libres: ";
 
 	for(a=0;a<tam-1;a++){
 		mensajeLog << this->vectorMemoriaPosicionesLibres[a] << " ";
@@ -166,5 +166,18 @@ int Lugares::getPosicionAleatoria()
 	numeroElegido = calcularRandom(cantidadPosiciones);
 
 	return this->vectorMemoriaPosicionesLibres[numeroElegido];
+}
+
+void Lugares::liberarMemoriaCompartidaPosiciones(int cantidadLugares)
+{
+	//Se libera la memoria compartida correspondiente a las posiciones en el estacionamiento.
+	int i;
+	for (i=0;i<cantidadLugares;i++)
+	{
+		MemoriaCompartida<Posicion> memoriaPosicion;
+		memoriaPosicion = this->vectorMemoriaPosiciones[i];
+		memoriaPosicion.liberar();
+	}
+
 }
 

@@ -41,6 +41,8 @@ public:
 	// Devuelve una posicion aleatoria del vector de posiciones libres. En caso de no haber ninguna devuelve -1
 	int getPosicionAleatoria();
 
+	void liberarMemoriaCompartidaPosiciones(int cantidadLugares);
+
 
 	virtual ~Lugares();
 };

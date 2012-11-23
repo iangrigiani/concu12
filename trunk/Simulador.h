@@ -46,13 +46,15 @@ protected:
 
     int numero;
 
+    int numeroEstacionamiento;
+
     // Devuelve la cantidad de autos almacenados en la memoria compartida de la administracion
 	int getCantidadAutosEstacionamiento();
 
 
 public:
 
-	Simulador(int numero,int cantidadPosiciones);
+	Simulador(int numero,int cantidadPosiciones,int numeroEstacionamiento);
 	virtual ~Simulador();
 };
 

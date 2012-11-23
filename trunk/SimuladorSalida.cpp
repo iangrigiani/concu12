@@ -1,7 +1,7 @@
 
 #include "SimuladorSalida.h"
 
-SimuladorSalida::SimuladorSalida(int numeroSalida,int cantidadPosiciones) : Simulador (numeroSalida,cantidadPosiciones)
+SimuladorSalida::SimuladorSalida(int numeroEstacionamiento,int numeroSalida,int cantidadPosiciones) : Simulador (numeroSalida,cantidadPosiciones,numeroEstacionamiento)
 {
 
 }
