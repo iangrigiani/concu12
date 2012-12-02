@@ -19,7 +19,8 @@
 #include "Pipe.h"
 #include "Semaforo.h"
 #include <algorithm>
-
+#include "Cola.h"
+#include "Mensaje.h"
 
 using namespace std;
 
@@ -32,6 +33,7 @@ private:
 	MemoriaCompartida<Administracion> administracion;
 
 	int numeroEstacionamiento;
+	int numeroPpal;
 
 	// Pipe para la comunicacion de todas las entradas y la consola con el proceso principal. Todos escriben
 	// ahi y el proceso principal solo lee
@@ -90,7 +92,7 @@ private:
 	int getSalidaAleatoria();
 
 	// Se encarga de llamar a los metodos para liberar memoria compartida, archivos temporales y el semaforo de la administracion
-	void liberarRecursos();
+	void liberarRecursos(int cantidadLugares);
 
 	// Libera la cantidad de memorias compartidas pasadas por parametros
 	void liberarMemoriaCompartidaPosiciones(int cantidadLugares);
@@ -108,7 +110,7 @@ private:
 
 public:
 
-	Estacionamiento(int numero);
+	Estacionamiento(int numero, int nroPpal);
 
 	virtual ~Estacionamiento();
 
