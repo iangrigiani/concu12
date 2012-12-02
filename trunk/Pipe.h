@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <iostream>
 
 #define	LECTURA		0
 #define	ESCRITURA	1

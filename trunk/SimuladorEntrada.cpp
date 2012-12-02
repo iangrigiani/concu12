@@ -22,7 +22,7 @@ int SimuladorEntrada::getNumeroEntrada()
 }
 
 
-void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
+void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstacionamiento){
 
 	pid_t w;
 
@@ -39,7 +39,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal){
 	while (!Cronometro::obtenerCronometro()->llegoAlFinal())
 	{
 		// Multiplico la variable por el numero de entrada para que las 3 tengan distinta semilla
-		int semilla = time(0) * this->getNumeroEntrada();
+		int semilla = time(0) * this->getNumeroEntrada() * nroEstacionamiento;
 		srand((unsigned)semilla);
 		double numeroAlearorio = this->getNumeroAleatorio();
 

@@ -1,11 +1,10 @@
 #include "Lugares.h"
 
-Lugares::Lugares() {
-
+Lugares::Lugares(int nroEstacionamiento) {
+	this->nroEstacionamiento = nroEstacionamiento;
 }
 
 Lugares::~Lugares() {
-
 }
 
 
@@ -21,12 +20,16 @@ bool Lugares::crearMemoriaCompartidaPosiciones(int cantidadLugares,int numeroEst
 	{
 		stringstream nombreArchivo;
 		stringstream mensajeLog;
+		stringstream msj;
 
 		// Creo archivo temporal
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
 		nombreArchivo<<ESTACIONAMIENTO;
 		nombreArchivo<<numeroEstacionamiento;
+
+		msj << "Lugares: creo archivos: " << nombreArchivo.str();
+		Log::getInstance()->loguear(msj.str());
 
 		// Creo la memoria asociada al archivo temporal
 		int estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
@@ -90,7 +93,7 @@ void Lugares::quitarPosicionLibre(int numeroPosicion)
 	int posicionBuscada = busquedaBinariaVectorLibres(inicio,fin,numeroPosicion);
 
 
-	mensajeLog << "Estacionamiento - Indice buscado =  " << posicionBuscada;
+	mensajeLog << "Estacionamiento " << this->nroEstacionamiento << " - Indice buscado =  " << posicionBuscada;
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	this->vectorMemoriaPosicionesLibres.erase (this->vectorMemoriaPosicionesLibres.begin()+posicionBuscada);
@@ -98,7 +101,7 @@ void Lugares::quitarPosicionLibre(int numeroPosicion)
 	int a;
 
 	mensajeLog.str("");
-	mensajeLog<<"Estacionamiento - Contenido del array de posiciones libres: ";
+	mensajeLog<<"Estacionamiento " << this->nroEstacionamiento << " - Contenido del array de posiciones libres: ";
 
 	for(a=0;a<tam-1;a++){
 		mensajeLog << this->vectorMemoriaPosicionesLibres[a] << " ";
@@ -123,7 +126,7 @@ void Lugares::agregarPosicionLibre(int numeroPosicion)
 	int tam = this->vectorMemoriaPosicionesLibres.size();
 
 	mensajeLog.str("");
-	mensajeLog << "ProcPrincipal - Contenido del array de posiciones libres: ";
+	mensajeLog << "Estacionamiento " << this->nroEstacionamiento << " - Contenido del array de posiciones libres: ";
 
 	for(a=0;a<tam;a++){
 		mensajeLog << this->vectorMemoriaPosicionesLibres[a] << " ";

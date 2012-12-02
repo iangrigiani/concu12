@@ -4,24 +4,27 @@
 
 #include "Estacionamiento.h"
 #include "Lugares.h"
+#include "Cola.h"
+#include "Mensaje.h"
 
 class AdministradorGeneral {
 
 private:
 
-		pid_t pConsola;
-		vector<Estacionamiento> estacionamientos;
-		vector<Lugares> lugares;
+	pid_t pConsola;
+	vector<Estacionamiento> estacionamientos;
+	vector<Lugares> lugares;
+	int totalSumatoriaEstacionamientos;
 
-		void inicializaciones(int cantidadEstacionamientos,int cantidadDeLugares);
+	void inicializaciones(int cantidadEstacionamientos,int cantidadDeLugares);
 
-		void crearArchivosTemporales(int cantidadLugares,int numeroEstacionamiento);
+	void crearArchivosTemporales(int cantidadLugares,int numeroEstacionamiento);
 
-		void liberarRecursos(int cantidadEstacionamientos,int cantidadLugares);
+	void liberarRecursos(int cantidadEstacionamientos,int cantidadLugares);
 
-		void liberarMemoriaCompartidaEstacionamiento(int numeroEstacionamiento,int cantidadLugares);
+	void liberarMemoriaCompartidaEstacionamiento(int numeroEstacionamiento,int cantidadLugares);
 
-		void eliminarArchivosTemporales(int numeroEstacionamiento, int cantidadLugares);
+	void eliminarArchivosTemporales(int numeroEstacionamiento, int cantidadLugares);
 
 public:
 

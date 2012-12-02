@@ -17,10 +17,11 @@ private:
 
 	vector< MemoriaCompartida<Posicion> > vectorMemoriaPosiciones;
 	vector<int> vectorMemoriaPosicionesLibres;
+	int nroEstacionamiento;
 
 public:
 
-	Lugares();
+	Lugares(int nroEstacionamiento);
 
 	// Crea las posiciones de memoria compartida segun la cantidad de lugares pasada por parametro
 	// En caso de haber algun error libera la memoria creada y devuelve false

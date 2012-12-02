@@ -3,13 +3,12 @@
 
 Simulador::Simulador(int numero, int cantidadPosiciones,int numeroEstacionamiento)
 {
+	this->numero = numero;
+	this->numeroEstacionamiento = numeroEstacionamiento;
+
 	//Asocian a la misma memoria compartida que crea el principal
 	inicializarMemoriaCompartidaVectorPosiciones(cantidadPosiciones);
 	inicializarMemoriaCompartidaAdministracion();
-
-	this->numero = numero;
-
-	this->numeroEstacionamiento = numeroEstacionamiento;
 
 	stringstream archivoSmfAdministracion;
 
@@ -40,12 +39,16 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 	{
 		stringstream nombreArchivo;
 		stringstream mensajeLog;
+		stringstream msj;
 
 		// Creo archivo temporal
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
 		nombreArchivo<<ESTACIONAMIENTO;
 		nombreArchivo<<this->numeroEstacionamiento;
+
+		msj << "este es el archivo: " << nombreArchivo.str();
+		Log::getInstance()->loguear(msj.str());
 
 		// Creo la memoria asociada al archivo temporal
 		int estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );

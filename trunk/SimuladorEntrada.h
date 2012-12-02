@@ -33,7 +33,7 @@ public:
 	// entre los procesos autos y el proceso principal. Tambien gestiona la actualizacion de los valores de monto recaudado
 	// y cantidad de autos de la memoria compartida de la administracion. Al finalizar la simulacion espera a que mueran
 	// todos sus procesos hijos antes de salir.
-	void simular(Pipe pipeEntrada, Pipe pipePpal);
+	void simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstacionamiento);
 
 	int getNumeroEntrada();
 
