@@ -50,7 +50,9 @@ void Log::loguear(string mensaje)
 			stringstream s;
 			s.setf( ios::fixed );
 			s.precision( PRECISION_SEGUNDOS );
-			s << "Proceso: "<< getpid() << " " << segundos << "s: " << mensaje << endl;
+			time_t timestamp = time(0);
+
+			s << timestamp << " - Proceso: "<< getpid() << " " << segundos << "s: " << mensaje << endl;
 
 
 			if (logFile.escribir(s.str().c_str(), strlen(s.str().c_str())) == -1) {

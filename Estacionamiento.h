@@ -94,9 +94,6 @@ private:
 	// Se encarga de llamar a los metodos para liberar memoria compartida, archivos temporales y el semaforo de la administracion
 	void liberarRecursos(int cantidadLugares);
 
-	// Libera la cantidad de memorias compartidas pasadas por parametros
-	void liberarMemoriaCompartidaPosiciones(int cantidadLugares);
-
 	// Libero la memoria compartida de administracion
 	void liberarMemoriaCompartidaAdministracion();
 

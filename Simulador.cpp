@@ -21,7 +21,7 @@ Simulador::Simulador(int numero, int cantidadPosiciones,int numeroEstacionamient
 	this->smfAdministracion = smfAdmin;
 
 	stringstream mensajeLog;
-	mensajeLog << "Simulador - Creo semaforo id: " << this->smfAdministracion.getId() << " (admin)";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Simulador - Creo semaforo id: " << this->smfAdministracion.getId() << " (admin)";
 	Log::getInstance()->loguear(mensajeLog.str());
 }
 
@@ -39,16 +39,12 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 	{
 		stringstream nombreArchivo;
 		stringstream mensajeLog;
-		stringstream msj;
 
 		// Creo archivo temporal
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
 		nombreArchivo<<ESTACIONAMIENTO;
 		nombreArchivo<<this->numeroEstacionamiento;
-
-		msj << "este es el archivo: " << nombreArchivo.str();
-		Log::getInstance()->loguear(msj.str());
 
 		// Creo la memoria asociada al archivo temporal
 		int estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
@@ -61,13 +57,13 @@ void Simulador::inicializarMemoriaCompartidaVectorPosiciones(int cantidadPosicio
 			Semaforo semaforo((char*)nombreArchivo.str().c_str(), 1, (char) i);
 			this->semaforos.push_back(semaforo);
 
-			mensajeLog << "Creo semaforo id: " << semaforo.getId();
+			mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Creo semaforo id: " << semaforo.getId();
 			Log::getInstance()->loguear(mensajeLog.str());
 			mensajeLog.flush();
 		}
 		else
 		{
-			mensajeLog << "Simulador - Error al inicializar el vector de memoria compartida en la posicion " << i << " en el simulador";
+			mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Simulador - Error al inicializar el vector de memoria compartida en la posicion " << i << " en el simulador";
 			Log::getInstance()->loguear(mensajeLog.str());
 			mensajeLog.flush();
 
@@ -93,7 +89,7 @@ void Simulador::inicializarMemoriaCompartidaAdministracion()
 
 	if(estadoMemoria != SHM_OK)
 	{
-		mensajeLog << "Error al inicializar la administracion de memoria compartida en el simulador";
+		mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Error al inicializar la administracion de memoria compartida en el simulador";
 		Log::getInstance()->loguear(mensajeLog.str());
 	}
 }

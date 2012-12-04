@@ -18,7 +18,7 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 		recibido[q] = 0;
 	}
 
-
+	stringstream mensajeLog;
 
 
 	//Inicializa el tiempo en el cronometro y arranca el tiempo a correr en la simulacion
@@ -27,15 +27,14 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 
 	cout << "Inicio de la simulacion..." << endl;
 
-
 	//Crea las memorias compartidas asociadas a cada uno de los estacionamientos y los
 	//vectores de posiciones libres
 	this->inicializaciones(cantidadEstacionamientos,cantidadDeLugares);
 
-	Cola<mensaje> colaMensajes( (char*)"valgrind.out",'a');
+	Cola<mensaje> colaMensajes( (char*)ARCHIVO_COLA_MENSAJES,'a');
 
 	// Creo otra cola para las consultas, cada estacionamiento va a tener un proceso escuchando esta cola
-	//Cola<mensaje> colaConsultas( (char*)"valgrind.out",'a');
+	Cola<mensaje> colaConsultas( (char*)ARCHIVO_COLA_MENSAJES_CONSULTAS,'a');
 
 	// cantidadEstacionamientos+1 es el valor que va a filtrar el proceso ppal para recibir mensajes
 	int msjPpal = cantidadEstacionamientos+1;
@@ -45,15 +44,15 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 	if( this->pConsola != 0)
 	{
 
+		// Guardo los pids de los estacionamientos
+		pid_t pEstacionamientos[cantidadEstacionamientos];
 
 		Log::getInstance()->loguear("Soy el proceso principal - el Administrador General");
 		for(int i=1;i<=cantidadEstacionamientos;i++)
 		{
 			this->totalSumatoriaEstacionamientos+=i;
 			pid_t pEstacionamiento = fork();
-
-			//TODO ver si tenemos una lista de pipes, uno por cada estacionamiento que se
-			//crea para comunicarse con el administrador general
+			pEstacionamientos[i-1] = pEstacionamiento;
 
 			if(pEstacionamiento == 0)
 			{
@@ -79,24 +78,39 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 			datoEnviado.from = msjPpal;
 			datoEnviado.mtype = datoLeido.from;
 
-			stringstream mensaje;
-			mensaje << "ProcEstacionamiento - acabo de recibir: " << datoLeido.msj;
-			Log::getInstance()->loguear(mensaje.str());
+			mensajeLog.str("");
+			mensajeLog << "ProcPrincipal - acabo de recibir: " << datoLeido.msj;
+			Log::getInstance()->loguear(mensajeLog.str());
 
 			stringstream retorno;
 
 			switch (datoLeido.msj[0])
 			{
 
-				//TODO HAY QUE MANEJAR EL SERVIDOR DE MENSAJES DE CONSOLA EN EL PRINCIPAL DE TODOS
-
 				case 'a': {
 					Log::getInstance()->loguear("Ingreso una 'a' por consola");
 
+					int fromOriginal = datoLeido.from;
+
+					char * token = strtok(datoLeido.msj, "|");
+					token = strtok(NULL, "|");
+
+					int nroEstacionamiento = atoi(token);
+					datoEnviado.mtype = nroEstacionamiento;
+
+					stringstream consulta;
+					consulta << "a";
+					strcpy(datoEnviado.msj,(char*)consulta.str().c_str());
+
 					// Aca tiene que mandar el msj a la cola de consultas
-					// colaConsultas.escribir(..);
-					//int cantidad = this->obtenerCantidadActualDeAutos();
-					retorno << "La cantidad actual de autos es : ";
+					colaConsultas.escribir(datoEnviado);
+
+					colaConsultas.leer(msjPpal,&datoLeido);
+
+					datoEnviado.mtype = fromOriginal;
+					datoEnviado.from = msjPpal;
+
+					retorno << "La cantidad actual de autos en el estacionamiento " << nroEstacionamiento << " es : " << datoLeido.msj;
 
 					strcpy(datoEnviado.msj, retorno.str().c_str());
 					colaMensajes.escribir(datoEnviado);
@@ -105,18 +119,44 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 				case 'm': {
 					Log::getInstance()->loguear("Ingreso una 'm' por consola");
 
+					int fromOriginal = datoLeido.from;
+
+					char * token = strtok(datoLeido.msj, "|");
+					token = strtok(NULL, "|");
+
+					int nroEstacionamiento = atoi(token);
+					datoEnviado.mtype = nroEstacionamiento;
+
+					stringstream consulta;
+					consulta << "m";
+					strcpy(datoEnviado.msj,(char*)consulta.str().c_str());
+
 					// Aca tiene que mandar el msj a la cola de consultas
-					// colaConsultas.escribir(..);
-					//float monto = this->obtenerMontoRecaudado();
-					retorno << "El monto recaudado hasta el momento es : ";
+					colaConsultas.escribir(datoEnviado);
+
+					colaConsultas.leer(msjPpal,&datoLeido);
+
+					datoEnviado.mtype = fromOriginal;
+					datoEnviado.from = msjPpal;
+
+					retorno << "El monto recaudado hasta el momento en el estacionamiento " << nroEstacionamiento << " es : " << datoLeido.msj;
 
 					strcpy(datoEnviado.msj, retorno.str().c_str());
 					colaMensajes.escribir(datoEnviado);
-
 					break;
 				}
 				case 'q': {
 					Log::getInstance()->loguear("Ingreso una 'q' por consola");
+
+					retorno << "q";
+
+					for(int i=1;i<=cantidadEstacionamientos;i++)
+					{
+						datoEnviado.mtype = i;
+						strcpy(datoEnviado.msj,(char*)retorno.str().c_str());
+
+						colaConsultas.escribir(datoEnviado);
+					}
 
 					salir = true;
 
@@ -126,9 +166,9 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 					char * token = strtok(datoLeido.msj, "|");
 					token = strtok(NULL, "|");
 
-					mensaje.str("");
-					mensaje << "ProcPrincipal - Saco del vector de posiciones libres la posicion: " << token;
-					Log::getInstance()->loguear(mensaje.str());
+					mensajeLog.str("");
+					mensajeLog << "ProcPrincipal - Saco del vector de posiciones libres la posicion: " << token;
+					Log::getInstance()->loguear(mensajeLog.str());
 
 					int pos = atoi(token);
 
@@ -141,9 +181,9 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 					char * token = strtok(datoLeido.msj, "|");
 					token = strtok(NULL, "|");
 
-					mensaje.str("");
-					mensaje << "ProcPrincipal - Agrego al  vector de posiciones libres la posicion: " << token;
-					Log::getInstance()->loguear(mensaje.str());
+					mensajeLog.str("");
+					mensajeLog << "ProcPrincipal - Agrego al  vector de posiciones libres la posicion: " << token;
+					Log::getInstance()->loguear(mensajeLog.str());
 
 					int pos = atoi(token);
 
@@ -157,9 +197,9 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 
 					sumatoriaEstacionamientosCerrados+=datoLeido.from;
 
-					mensaje.str("");
-					mensaje << "ProcPrincipal - La suma del numero de estacionamientos cerrados es " << sumatoriaEstacionamientosCerrados;
-					Log::getInstance()->loguear(mensaje.str());
+					mensajeLog.str("");
+					mensajeLog << "ProcPrincipal - La suma del numero de estacionamientos cerrados es " << sumatoriaEstacionamientosCerrados;
+					Log::getInstance()->loguear(mensajeLog.str());
 
 					if(sumatoriaEstacionamientosCerrados == this->totalSumatoriaEstacionamientos)
 					{
@@ -176,9 +216,9 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 					strcpy(datoEnviado.msj,retorno.str().c_str());
 
 
-					mensaje.str("");
-					mensaje << "ProcPrincipal - Estacionamiento " << datoLeido.from << " pide una posicion, le envio: " << nroPosicion;
-					Log::getInstance()->loguear(mensaje.str());
+					mensajeLog.str("");
+					mensajeLog << "ProcPrincipal - Estacionamiento " << datoLeido.from << " pide una posicion, le envio: " << nroPosicion;
+					Log::getInstance()->loguear(mensajeLog.str());
 
 					colaMensajes.escribir(datoEnviado);
 
@@ -186,26 +226,28 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 				}
 				default: {
 
-					cout << "Comando invalido! Ingrese 'a' para ver la cantidad de autos estacionados, ";
-					cout << "'m' para conocer el monto recaudado ";
+					cout << "Comando invalido! Ingrese 'a' seguido del nro de estacionamiento para ver la cantidad de autos estacionados, ";
+					cout << "'m' seguido del nro de estacionamiento para conocer el monto recaudado ";
 					cout << " o 'q' para finalizar el programa" << endl;
 					break;
 				}
 			}
 		}
 
-
-		//TODO finalizar procesos, debe esperar a que finalicen los procesos de los estacionamientos
 		int estado;
 		for(int i=0;i<cantidadEstacionamientos;i++)
 		{
-			cout << "Liberado el estacionamiento... " << i << endl;
-			wait(&estado);
+			mensajeLog.str("");
+			mensajeLog << "Liberado el estacionamiento... " << i+1;
+			Log::getInstance()->loguear(mensajeLog.str());
+
+			waitpid(pEstacionamientos[i],&estado,0);
 		}
 		waitpid(this->pConsola, &estado,0);
 
-		liberarRecursos(cantidadEstacionamientos,cantidadDeLugares);
 		colaMensajes.destruir();
+		colaConsultas.destruir();
+		liberarRecursos(cantidadEstacionamientos,cantidadDeLugares);
 	}
 	else
 	{
@@ -214,13 +256,10 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 		int msjConsola = cantidadEstacionamientos+2;
 
 		// Proceso consola
-		//TODO CAMBIAR EL INGRESO DE POSIBLES COMANDOS EN EL PROCESO CONSOLA
 		stringstream mensajeLog;
 		mensajeLog << "Soy el proceso consola esperando el ingreso por pantalla.";
 		Log::getInstance()->loguear(mensajeLog.str());
 
-
-		Cola<mensaje> cola( (char*)"valgrind.out",'a');
 		mensaje datoEnviar;
 		mensaje datoLeer;
 
@@ -232,7 +271,8 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 		while (!salir) {
 
 
-			cout << "Ingrese un comando: ( 'a' para averiguar la cantidad de autos estacionados o 'm' el monto recaudado )" << endl;
+			cout << "Ingrese un comando: ( 'a' seguido del nro de estacionamiento para averiguar la cantidad de autos estacionados ";
+			cout << "o 'm' seguido del nro de estacionamiento para averiguar el monto recaudado )" << endl;
 			cin.getline(recibido, BUFFSIZE);
 
 			char * primerParametro = strtok(recibido, " ");
@@ -252,23 +292,23 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 					ssRecibido << nroEstacionamiento;
 				}
 
-				ssRecibido << "?";
-				strcpy(datoEnviar.msj,ssRecibido.str().c_str());
+				if (nroEstacionamiento <= cantidadEstacionamientos) {
 
-				cola.escribir(datoEnviar);
+					strcpy(datoEnviar.msj,ssRecibido.str().c_str());
 
-				if (letra != 'q') {
+					colaMensajes.escribir(datoEnviar);
 
-					// agregar validacion de nro de estacionamiento
-					cola.leer(msjConsola,&datoLeer);
+					if (letra != 'q') {
+						colaMensajes.leer(msjConsola,&datoLeer);
 
-					cout << "me contesto: " << datoLeer.msj << endl;
-
-					//cout << recibir << endl;
-
+						cout << datoLeer.msj << endl;
+					} else {
+						salir = true;
+					}
 				} else {
-					salir = true;
+					cout << "Numero de estacionamiento invalido, debe ser menor o igual a " << cantidadEstacionamientos << endl;
 				}
+
 			} else {
 				cout << "Comando invalido." << endl;
 			}
@@ -342,6 +382,29 @@ void AdministradorGeneral::crearArchivosTemporales(int cantidadLugares, int nume
 	mensaje << "Creo el archivo temporal: " << archivoSmfPosiciones.str();
 	Log::getInstance()->loguear(mensaje.str());
 
+	// Cola de mensajes
+	stringstream archivoColaMsjs;
+	archivoColaMsjs << ARCHIVO_COLA_MENSAJES;
+
+	tmpFile = fopen(archivoColaMsjs.str().c_str(),"w");
+	fclose(tmpFile);
+
+	mensaje.str("");
+	mensaje << "Creo el archivo temporal: " << archivoColaMsjs.str();
+	Log::getInstance()->loguear(mensaje.str());
+
+
+	stringstream archivoColaMsjsConsultas;
+	archivoColaMsjsConsultas << ARCHIVO_COLA_MENSAJES_CONSULTAS;
+
+	tmpFile = fopen(archivoColaMsjsConsultas.str().c_str(),"w");
+	fclose(tmpFile);
+
+	mensaje.str("");
+	mensaje << "Creo el archivo temporal: " << archivoColaMsjsConsultas.str();
+	Log::getInstance()->loguear(mensaje.str());
+
+
 }
 
 void AdministradorGeneral::liberarMemoriaCompartidaEstacionamiento(int numeroEstacionamiento,int cantidadLugares)
@@ -383,6 +446,25 @@ void AdministradorGeneral::eliminarArchivosTemporales(int numeroEstacionamiento,
 	mensaje << "Destruyo el archivo temporal: " << archivoSmfPosiciones.str();
 	Log::getInstance()->loguear(mensaje.str());
 
+
+	// Cola de mensajes
+	stringstream archivoColaMsjs;
+	archivoColaMsjs << ARCHIVO_COLA_MENSAJES;
+
+	remove(archivoColaMsjs.str().c_str());
+	mensaje.str("");
+	mensaje << "Destruyo el archivo temporal: " << archivoColaMsjs.str();
+	Log::getInstance()->loguear(mensaje.str());
+
+
+	stringstream archivoColaMsjsConsultas;
+	archivoColaMsjsConsultas << ARCHIVO_COLA_MENSAJES_CONSULTAS;
+
+	remove(archivoColaMsjsConsultas.str().c_str());
+	mensaje.str("");
+	mensaje << "Destruyo el archivo temporal: " << archivoColaMsjsConsultas.str();
+	Log::getInstance()->loguear(mensaje.str());
+
 }
 
 
@@ -392,11 +474,11 @@ void AdministradorGeneral::liberarRecursos(int cantidadEstacionamientos,int cant
 
 	for(i = 1; i<=cantidadEstacionamientos;i++)
 	{
-		// Libero memoria compartida de posiciones
-		liberarMemoriaCompartidaEstacionamiento(i,cantidadLugares);
-
 		//Se eliminan los archivos temporales creados
 		eliminarArchivosTemporales(i, cantidadLugares);
+
+		// Libero memoria compartida de posiciones
+		liberarMemoriaCompartidaEstacionamiento(i,cantidadLugares);
 	}
 
 }

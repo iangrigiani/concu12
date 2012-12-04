@@ -20,16 +20,12 @@ bool Lugares::crearMemoriaCompartidaPosiciones(int cantidadLugares,int numeroEst
 	{
 		stringstream nombreArchivo;
 		stringstream mensajeLog;
-		stringstream msj;
 
 		// Creo archivo temporal
 		nombreArchivo << ARCHIVO_POSICIONES;
 		nombreArchivo << i;
 		nombreArchivo<<ESTACIONAMIENTO;
 		nombreArchivo<<numeroEstacionamiento;
-
-		msj << "Lugares: creo archivos: " << nombreArchivo.str();
-		Log::getInstance()->loguear(msj.str());
 
 		// Creo la memoria asociada al archivo temporal
 		int estadoMemoria = memoria.crear ( (char*)nombreArchivo.str().c_str(),'R' );
@@ -165,7 +161,7 @@ int Lugares::getPosicionAleatoria()
 
 	int numeroElegido;
 
-	srand((unsigned)time(0));
+	srand((unsigned)time(0)*this->nroEstacionamiento);
 	numeroElegido = calcularRandom(cantidadPosiciones);
 
 	return this->vectorMemoriaPosicionesLibres[numeroElegido];
