@@ -1,11 +1,12 @@
 #include "Auto.h"
 
 
-Auto::Auto(int horasEstadia)
+Auto::Auto(int horasEstadia, int numeroEstacionamiento)
 {
 	this->haEntrado = false;
 	this->horasEstadia = horasEstadia;
 	this->numeroPosicion = 0;
+	this->numeroEstacionamiento = numeroEstacionamiento;
 }
 
 
@@ -43,9 +44,9 @@ int Auto::getHorasEstadia(){
 void Auto::run(){
 	stringstream mensajeLog;
 
-	mensajeLog << "Soy el auto " << getpid() << " y voy a estar estacionado " << this->horasEstadia << " horas en la posicion " << this->numeroPosicion;
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Soy el auto " << getpid() << " y voy a estar estacionado " << this->horasEstadia << " horas en la posicion " << this->numeroPosicion;
 	Log::getInstance()->loguear(mensajeLog.str());
 
-	cout << "Soy el auto " << getpid() << " y voy a estar estacionado " << this->horasEstadia << " horas en la posicion " << this->numeroPosicion  << endl;
+	cout << "Estacionamiento " << this->numeroEstacionamiento << " - Soy el auto " << getpid() << " y voy a estar estacionado " << this->horasEstadia << " horas en la posicion " << this->numeroPosicion  << endl;
 	sleep(this->horasEstadia);
 }

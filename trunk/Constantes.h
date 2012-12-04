@@ -10,6 +10,10 @@ const char* const ARCHIVO_ADMINISTRACION = "/tmp/tmpAdministracion";
 const char* const ARCHIVO_SEMAFORO_ADMINISTRACION = "/tmp/tmpSmfAdministracion";
 const char* const ARCHIVO_SEMAFORO_POSICIONES = "/tmp/tmpSmfPosiciones";
 
+//COLA DE MENSAJES
+const char* const ARCHIVO_COLA_MENSAJES = "/tmp/colaMsjs";
+const char* const ARCHIVO_COLA_MENSAJES_CONSULTAS = "/tmp/colaMsjsConsultas";
+
 //ESTACIONAMIENTOS
 const char* const ESTACIONAMIENTO = "Estacionamiento";
 

@@ -14,10 +14,11 @@ class Auto
 			bool haEntrado;
 			int horasEstadia;
 			int numeroPosicion;
+			int numeroEstacionamiento;
 
 
 	public:
-			Auto(int horasEstadia);
+			Auto(int horasEstadia, int numeroEstacionamiento);
 
 			~Auto();
 

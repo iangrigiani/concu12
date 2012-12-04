@@ -27,7 +27,7 @@ void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 
 				//cout << "Salida - " << this->getNumeroSalida() << " recibio " << token << endl;
 				mensajeLog.str("");
-				mensajeLog << "Salida " << this->getNumeroSalida() << " - Recibio " << token;
+				mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Recibio " << token;
 				Log::getInstance()->loguear(mensajeLog.str());
 
 				seguir = false;
@@ -41,7 +41,7 @@ void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 
 				//cout<<"Numero posicion recibido por salida "<<getNumeroSalida()<< " es "<<numeroPosicion<<endl;
 				mensajeLog.str("");
-				mensajeLog << "Salida " << this->getNumeroSalida() << " - Numero posicion recibido por salida " << getNumeroSalida() << " es " << numeroPosicion;
+				mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Numero posicion recibido por salida " << getNumeroSalida() << " es " << numeroPosicion;
 				Log::getInstance()->loguear(mensajeLog.str());
 
 				this->decrementarCantidadAutosEstacionamiento();
@@ -60,7 +60,7 @@ void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 
 				//cout << "Salida - " << getNumeroSalida() << " y le escribo al principal" << endl;
 				mensajeLog.str("");
-				mensajeLog << "Salida " << getNumeroSalida() << " - Le escribo al principal para que libere la posicion " << numeroPosicion;
+				mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << getNumeroSalida() << " - Le escribo al principal para que libere la posicion " << numeroPosicion;
 				Log::getInstance()->loguear(mensajeLog.str());
 
 				break;
@@ -71,7 +71,7 @@ void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 	liberarSemaforos();
 	//cout << "Salida - " << this->getNumeroSalida() << " y numero proceso " << getpid() << " y muero ahora" << endl;
 	mensajeLog.str("");
-	mensajeLog << "Salida " << this->getNumeroSalida() << " - Numero proceso " << getpid() << " y muero ahora";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Numero proceso " << getpid() << " y muero ahora";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	pipeSalida.cerrar();
@@ -92,7 +92,7 @@ void SimuladorSalida::liberarLugar(int numeroPosicion)
 
 	//Bloqueo la posicion
 	semaforos[numeroPosicion].p();
-	mensajeLog << "Salida " << this->getNumeroSalida() << " - Tome el semaforo de posicion " << numeroPosicion;
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Tome el semaforo de posicion " << numeroPosicion;
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	memoria = this->vectorMemoriaPosiciones[numeroPosicion];
@@ -104,14 +104,14 @@ void SimuladorSalida::liberarLugar(int numeroPosicion)
 	this->vectorMemoriaPosiciones[numeroPosicion] = memoria;
 
 	mensajeLog.str("");
-	mensajeLog << "Salida " << this->getNumeroSalida() << " - Libero el semaforo de posicion " << numeroPosicion;
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Libero el semaforo de posicion " << numeroPosicion;
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	//Desbloqueo la posicion
 	semaforos[numeroPosicion].v();
 
 	mensajeLog.str("");
-	mensajeLog << "Salida " << this->getNumeroSalida() << " - Modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
 	Log::getInstance()->loguear(mensajeLog.str());
 }
 
@@ -122,7 +122,7 @@ void SimuladorSalida::decrementarCantidadAutosEstacionamiento()
 	// Tomo el semaforo
 	this->smfAdministracion.p();
 
-	mensajeLog << "Salida " << this->getNumeroSalida() << " - Tome semaforo administracion";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Tome semaforo administracion";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	Administracion admin = (Administracion)this->administracion.leer();
@@ -132,14 +132,14 @@ void SimuladorSalida::decrementarCantidadAutosEstacionamiento()
 	this->administracion.escribir(admin);
 
 	mensajeLog.str("");
-	mensajeLog << "Salida " << this->getNumeroSalida() << " - Libero semaforo administracion";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Libero semaforo administracion";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	// Libero el semaforo
 	this->smfAdministracion.v();
 
 	mensajeLog.str("");
-	mensajeLog << "Salida " << this->getNumeroSalida() << " - Se registra la salida de un auto al estacionamiento habiendo en total: " << admin.getCantidadDeAutos();
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Se registra la salida de un auto al estacionamiento habiendo en total: " << admin.getCantidadDeAutos();
 	Log::getInstance()->loguear(mensajeLog.str());
 }
 
@@ -150,7 +150,7 @@ void SimuladorSalida::liberarSemaforos(){
 
 		stringstream mensajeLog;
 
-		mensajeLog << "Salida " << this->getNumeroSalida() << " - Libero semaforo id: " << itSemaforos->getId();
+		mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Libero semaforo id: " << itSemaforos->getId();
 		Log::getInstance()->loguear(mensajeLog.str());
 
 		itSemaforos->eliminar();

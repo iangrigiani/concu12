@@ -58,7 +58,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 			{
 				//cout << "Entrada " << this->getNumeroEntrada() << " Proceso hijo creado " << getpid() << endl;
 				mensajeLog.str("");
-				mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Proceso hijo creado " << getpid();
+				mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Proceso hijo creado " << getpid();
 				Log::getInstance()->loguear(mensajeLog.str());
 
 				// Frena el proceso hasta que la entrada le diga si puede entrar o no
@@ -75,18 +75,18 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 
 					//cout<<"Numero Posicion asignada al auto que entra  "<<numeroPosicion<<" en la entrada "<<this->getNumeroEntrada()<<endl;
 					mensajeLog.str("");
-					mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Numero Posicion asignada al auto que entra: " << numeroPosicion;
+					mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Numero Posicion asignada al auto que entra: " << numeroPosicion;
 					Log::getInstance()->loguear(mensajeLog.str());
 
 					double horasAleatoriasEstadia = this->getNumeroAleatorio();
 					int horas = ceil(50*horasAleatoriasEstadia);
-					Auto automovil(horas);
+					Auto automovil(horas, this->numeroEstacionamiento);
 					automovil.setNumeroPosicion(numeroPosicion);
 
 
 					//cout << "Entrada " << this->getNumeroEntrada() << " Soy el auto pid: " << getpid() << " y entro en la posicion: " << numeroPosicion << endl;
 					mensajeLog.str("");
-					mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Soy el auto pid: " << getpid() << " y entro en la posicion: " << numeroPosicion;
+					mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Soy el auto pid: " << getpid() << " y entro en la posicion: " << numeroPosicion;
 					Log::getInstance()->loguear(mensajeLog.str());
 
 					//El auto duerme el tiempo que permanece en el estacionamiento
@@ -102,9 +102,9 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 					salida<<automovil.getNumeroPosicion();
 					salida<<"?";
 
-					cout << "Soy el auto " << getpid() << " y la posicion que dejo es " << automovil.getNumeroPosicion() << endl;
+					cout << "Estacionamiento " << nroEstacionamiento << " - Soy el auto " << getpid() << " y la posicion que dejo es " << automovil.getNumeroPosicion() << endl;
 					mensajeLog.str("");
-					mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Soy el auto pid: " << getpid() << " La posicion que dejo es " << automovil.getNumeroPosicion();
+					mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Soy el auto pid: " << getpid() << " La posicion que dejo es " << automovil.getNumeroPosicion();
 					Log::getInstance()->loguear(mensajeLog.str());
 
 					pipePpal.escribir((char*)salida.str().c_str(),salida.str().length());
@@ -112,7 +112,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 				} else {
 					//cout << "Entrada " << this->getNumeroEntrada() << " Soy el auto pid: " << getpid() << " y no me dejaron entrar porque no hay lugar!" << endl;
 					mensajeLog.str("");
-					mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Soy el auto pid: " << getpid() << " y no me dejaron entrar porque no hay lugar!";
+					mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Soy el auto pid: " << getpid() << " y no me dejaron entrar porque no hay lugar!";
 					Log::getInstance()->loguear(mensajeLog.str());
 				}
 				pipeAuto.cerrar();
@@ -150,7 +150,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 
 					//cout<<"Soy la entrada "<<this->getNumeroEntrada()<<" y recibi la posicion "<<numeroPosicion<<endl;
 					mensajeLog.str("");
-					mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Recibi la posicion " << numeroPosicion;
+					mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Recibi la posicion " << numeroPosicion;
 					Log::getInstance()->loguear(mensajeLog.str());
 
 					//Si devuelve un nro negativo, entonces no hay lugar y el auto no puede ingresar
@@ -169,7 +169,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 						{
 							//cout<<"Soy la entrada "<<this->getNumeroEntrada()<<"y pude ocupar la posicion "<<numeroPosicion<<endl;
 							mensajeLog.str("");
-							mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Pude ocupar la posicion " << numeroPosicion;
+							mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Pude ocupar la posicion " << numeroPosicion;
 							Log::getInstance()->loguear(mensajeLog.str());
 
 							pipeAuto.escribir((char*)stringRecibido.c_str(),bytes);
@@ -186,7 +186,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 
 							//cout<<"Soy la entrada "<<this->getNumeroEntrada()<<" y le envio al principal "<<param.str()<<endl;
 							mensajeLog.str("");
-							mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Le envio al principal " << param.str();
+							mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Le envio al principal " << param.str();
 							Log::getInstance()->loguear(mensajeLog.str());
 
 							pipePpal.escribir((char*)param.str().c_str(),param.str().length());
@@ -197,7 +197,7 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 						} else {
 							//cout << "Entrada " << this->getNumeroEntrada() << " no puedo ocupar posicion: " << numeroPosicion << endl;
 							mensajeLog.str("");
-							mensajeLog << "Entrada " << this->getNumeroEntrada() << " - no puedo ocupar posicion: " << numeroPosicion;
+							mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - no puedo ocupar posicion: " << numeroPosicion;
 							Log::getInstance()->loguear(mensajeLog.str());
 						}
 					}
@@ -208,19 +208,19 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 		sleep(1);
 		//cout << "Entrada " << this->getNumeroEntrada() << " Cantidad de autos: " << this->cantidadAutosCreados << endl;
 		mensajeLog.str("");
-		mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Cantidad de autos creados: " << this->cantidadAutosCreados;
+		mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Cantidad de autos creados: " << this->cantidadAutosCreados;
 		Log::getInstance()->loguear(mensajeLog.str());
 	}
 
 
 	//cout << "Entrada " << this->getNumeroEntrada() << " Fin simulacion, esperando que terminen todos los procesos..." << endl;
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Fin simulacion, esperando que terminen todos los procesos...";
+	mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Fin simulacion, esperando que terminen todos los procesos...";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	//cout << "Entrada " << this->getNumeroEntrada() << " Cantidad de autos: " << this->cantidadAutosCreados << endl;
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Cantidad de autos creados: " << this->cantidadAutosCreados;
+	mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Cantidad de autos creados: " << this->cantidadAutosCreados;
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	int estado;
@@ -229,14 +229,14 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 		w = wait(&estado);
 		//cout << "Entrada " << this->getNumeroEntrada() << " Terminado proceso..." << w << endl;
 		mensajeLog.str("");
-		mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Terminado proceso..." << w;
+		mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Terminado proceso..." << w;
 		Log::getInstance()->loguear(mensajeLog.str());
 
 		this->cantidadAutosCreados--;
 
 		//cout << "Entrada " << this->getNumeroEntrada() << " Cantidad de autos: " << this->cantidadAutosCreados << ". Esperando que salgan los demas..." << endl;
 		mensajeLog.str("");
-		mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Cantidad de autos: " << this->cantidadAutosCreados << ". Esperando que salgan los demas...";
+		mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Cantidad de autos: " << this->cantidadAutosCreados << ". Esperando que salgan los demas...";
 		Log::getInstance()->loguear(mensajeLog.str());
 	}
 
@@ -249,14 +249,14 @@ void SimuladorEntrada::simular(Pipe pipeEntrada, Pipe pipePpal, int nroEstaciona
 
 	//cout << "Entrada " << this->getNumeroEntrada() << " - Escribo: " << numeroEntrada.str() << endl;
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Escribo: " << numeroEntrada.str();
+	mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Escribo: " << numeroEntrada.str();
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	pipePpal.escribir((char*)numeroEntrada.str().c_str(),numeroEntrada.str().length());
 
 	//cout << "Entrada " << this->getNumeroEntrada() << " - y muero ahora" << endl;
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - y muero ahora";
+	mensajeLog << "Estacionamiento " << nroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - y muero ahora";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	pipeEntrada.cerrar();
@@ -276,7 +276,7 @@ bool SimuladorEntrada::modificarPosicionCompartida(int numeroPosicion)
 	//Bloqueo la posicion
 	semaforos[numeroPosicion].p();
 
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Tome el semaforo de posicion " << numeroPosicion;
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Tome el semaforo de posicion " << numeroPosicion;
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	memoria = this->vectorMemoriaPosiciones[numeroPosicion];
@@ -292,7 +292,7 @@ bool SimuladorEntrada::modificarPosicionCompartida(int numeroPosicion)
 	}
 
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Libero el semaforo de posicion " << numeroPosicion;
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Libero el semaforo de posicion " << numeroPosicion;
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	//Desbloqueo la posicion
@@ -301,7 +301,7 @@ bool SimuladorEntrada::modificarPosicionCompartida(int numeroPosicion)
 	if(pude)
 	{
 		mensajeLog.str("");
-		mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
+		mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Modifico la posicion " << numeroPosicion <<" poniendola como ocupada en el vector de posiciones.";
 		Log::getInstance()->loguear(mensajeLog.str());
 	}
 
@@ -317,7 +317,7 @@ void SimuladorEntrada::incrementarCantidadDeAutosEstacionamiento()
 	// Tomo el semaforo
 	this->smfAdministracion.p();
 
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Tome el semaforo de administracion ";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Tome el semaforo de administracion ";
 	Log::getInstance()->loguear(mensajeLog.str());
 	Administracion admin = (Administracion)this->administracion.leer();
 
@@ -326,14 +326,14 @@ void SimuladorEntrada::incrementarCantidadDeAutosEstacionamiento()
 	this->administracion.escribir(admin);
 
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Libero el semaforo de administracion ";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Libero el semaforo de administracion ";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	// Libero el semaforo
 	this->smfAdministracion.v();
 
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Se registra la entrada de un auto al estacionamiento habiendo en total: " << admin.getCantidadDeAutos();
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Se registra la entrada de un auto al estacionamiento habiendo en total: " << admin.getCantidadDeAutos();
 	Log::getInstance()->loguear(mensajeLog.str());
 }
 
@@ -345,7 +345,7 @@ void SimuladorEntrada::incrementarMontoRecaudado(int horas)
 	// Tomo el semaforo
 	this->smfAdministracion.p();
 
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Tome el semaforo de administracion ";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Tome el semaforo de administracion ";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	Administracion admin = (Administracion)this->administracion.leer();
@@ -355,14 +355,14 @@ void SimuladorEntrada::incrementarMontoRecaudado(int horas)
 	this->administracion.escribir(admin);
 
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - Libero el semaforo de administracion ";
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - Libero el semaforo de administracion ";
 	Log::getInstance()->loguear(mensajeLog.str());
 
 	// Libero el semaforo
 	this->smfAdministracion.v();
 
 	mensajeLog.str("");
-	mensajeLog << "Entrada " << this->getNumeroEntrada() << " - El importe total registrado hasta el momento es : " << admin.getImporteRecaudado();
+	mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Entrada " << this->getNumeroEntrada() << " - El importe total registrado hasta el momento es : " << admin.getImporteRecaudado();
 	Log::getInstance()->loguear(mensajeLog.str());
 }
 
