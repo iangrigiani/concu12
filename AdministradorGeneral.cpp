@@ -52,7 +52,6 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 		{
 			this->totalSumatoriaEstacionamientos+=i;
 			pid_t pEstacionamiento = fork();
-			pEstacionamientos[i-1] = pEstacionamiento;
 
 			if(pEstacionamiento == 0)
 			{
@@ -60,6 +59,11 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 				estacionamiento.run(cantidadDeLugares,costoHora,tiempoEjecucion);
 				Cronometro::destruir();
 				return;
+			} else {
+				mensajeLog.str("");
+				mensajeLog << "Estacionamiento " << i << " pid: " << pEstacionamiento;
+				Log::getInstance()->loguear(mensajeLog.str());
+				pEstacionamientos[i-1] = pEstacionamiento;
 			}
 		}
 		//Soy el proceso administrador general
@@ -237,11 +241,12 @@ void AdministradorGeneral::run(int cantidadDeLugares, float costoHora, int tiemp
 		int estado;
 		for(int i=0;i<cantidadEstacionamientos;i++)
 		{
+			waitpid(pEstacionamientos[i],&estado,0);
+
 			mensajeLog.str("");
-			mensajeLog << "Liberado el estacionamiento... " << i+1;
+			mensajeLog << "Liberado el estacionamiento... " << i+1 << " pid: " << pEstacionamientos[i];
 			Log::getInstance()->loguear(mensajeLog.str());
 
-			waitpid(pEstacionamientos[i],&estado,0);
 		}
 		waitpid(this->pConsola, &estado,0);
 
