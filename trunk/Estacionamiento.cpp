@@ -286,7 +286,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 												mensaje << "Estacionamiento " << this->numeroEstacionamiento << " - Auto sale del estacionamiento por la salida " << numeroSalida << " y deja la posicion " << pos;
 												Log::getInstance()->loguear(mensaje.str());
 
-												retorno << "s|" << pos;
+												retorno << "s|" << pos << "?";
 												if(numeroSalida == 1){
 													this->pipeSalida1.escribir((char*)retorno.str().c_str(),retorno.str().length());
 												} else {
@@ -307,7 +307,7 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 
 													if(cantidadTotalEntradas == CANTIDAD_TOTAL_ENTRADAS)
 													{
-														retorno << "f";
+														retorno << "f?";
 														this->pipeSalida1.escribir((char*)retorno.str().c_str(),retorno.str().length());
 														this->pipeSalida2.escribir((char*)retorno.str().c_str(),retorno.str().length());
 
@@ -355,6 +355,11 @@ void Estacionamiento::run(int cantidadDeLugares, float costoHora, int tiempoEjec
 								liberarRecursos(cantidadDeLugares);
 
 								finalizarPipes();
+
+								stringstream msj;
+								msj.str("");
+								msj << "Estacionamiento " << this->numeroEstacionamiento << " ME FUIIII";
+								Log::getInstance()->loguear(msj.str());
 							}
 						}
 					}

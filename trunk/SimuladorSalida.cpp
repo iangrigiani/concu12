@@ -18,52 +18,62 @@ void SimuladorSalida::simular(Pipe pipeSalida, Pipe pipePpal)
 		int bytes = pipeSalida.leer(recibido, BUFFSIZE);
 		recibido[bytes] = '\0';
 
-		stringstream retorno;
+		// Me aseguro que solo se procesen los bytes recibidos y no la posible basura existente en el array
+		string stringRecibido(recibido);
+		stringRecibido = stringRecibido.substr(0, bytes);
 
-		switch (recibido[0])
-		{
-			case 'f': {
-				char * token = strtok(recibido, "|");
+		string token;
+		stringstream stream(stringRecibido);
+		while( getline(stream, token, '?') ) {
 
-				//cout << "Salida - " << this->getNumeroSalida() << " recibio " << token << endl;
-				mensajeLog.str("");
-				mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Recibio " << token;
-				Log::getInstance()->loguear(mensajeLog.str());
+			char * recibidoParcial = (char*)token.c_str();
+			stringstream retorno;
 
-				seguir = false;
-				break;
-			}
-			case 's': {
+			switch (recibidoParcial[0])
+			{
+				case 'f': {
+					char * token = strtok(recibidoParcial, "|");
 
-				char * token = strtok(recibido, "|");
-				token = strtok(NULL, "|");
-				int numeroPosicion = atoi(token);
+					//cout << "Salida - " << this->getNumeroSalida() << " recibio " << token << endl;
+					mensajeLog.str("");
+					mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Recibio " << token;
+					Log::getInstance()->loguear(mensajeLog.str());
 
-				//cout<<"Numero posicion recibido por salida "<<getNumeroSalida()<< " es "<<numeroPosicion<<endl;
-				mensajeLog.str("");
-				mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Numero posicion recibido por salida " << getNumeroSalida() << " es " << numeroPosicion;
-				Log::getInstance()->loguear(mensajeLog.str());
+					seguir = false;
+					break;
+				}
+				case 's': {
 
-				this->decrementarCantidadAutosEstacionamiento();
+					char * token = strtok(recibidoParcial, "|");
+					token = strtok(NULL, "|");
+					int numeroPosicion = atoi(token);
 
-				this->liberarLugar(numeroPosicion);
+					//cout<<"Numero posicion recibido por salida "<<getNumeroSalida()<< " es "<<numeroPosicion<<endl;
+					mensajeLog.str("");
+					mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << this->getNumeroSalida() << " - Numero posicion recibido por salida " << getNumeroSalida() << " es " << numeroPosicion;
+					Log::getInstance()->loguear(mensajeLog.str());
 
-				//Hay que avisarle al proceso servidor de mensajes (ppal) que agregue la
-				//posicion que dejo el auto a la lista de libres
-				stringstream param;
+					this->decrementarCantidadAutosEstacionamiento();
 
-				param<<"d|";
-				param<<numeroPosicion;
-				param<<"?";
+					this->liberarLugar(numeroPosicion);
 
-				pipePpal.escribir((char*)param.str().c_str(),param.str().length());
+					//Hay que avisarle al proceso servidor de mensajes (ppal) que agregue la
+					//posicion que dejo el auto a la lista de libres
+					stringstream param;
 
-				//cout << "Salida - " << getNumeroSalida() << " y le escribo al principal" << endl;
-				mensajeLog.str("");
-				mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << getNumeroSalida() << " - Le escribo al principal para que libere la posicion " << numeroPosicion;
-				Log::getInstance()->loguear(mensajeLog.str());
+					param<<"d|";
+					param<<numeroPosicion;
+					param<<"?";
 
-				break;
+					pipePpal.escribir((char*)param.str().c_str(),param.str().length());
+
+					//cout << "Salida - " << getNumeroSalida() << " y le escribo al principal" << endl;
+					mensajeLog.str("");
+					mensajeLog << "Estacionamiento " << this->numeroEstacionamiento << " - Salida " << getNumeroSalida() << " - Le escribo al principal para que libere la posicion " << numeroPosicion;
+					Log::getInstance()->loguear(mensajeLog.str());
+
+					break;
+				}
 			}
 		}
 	}
